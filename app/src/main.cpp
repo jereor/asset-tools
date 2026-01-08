@@ -1,8 +1,9 @@
 #include <iostream>
+#include "core/Version.h"
 
 int main()
 {
-    std::cout << "Hello Jere!\n";
+    std::cout << core::GetVersionString() << std::endl;
 
     return 0;
 }
