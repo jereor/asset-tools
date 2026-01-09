@@ -1,5 +1,6 @@
 add_library(core STATIC
     src/Version.cpp
+    src/Logger.cpp
 )
 
 target_include_directories(core
