@@ -5,26 +5,26 @@
 #include <mutex>
 #include <ctime>
 
-namespace
-{
-    std::ofstream g_logFile;
-    std::mutex g_logMutex;
-    bool g_initialized = false;
-
-    const char* ToString(core::LogLevel level)
-    {
-        switch (level)
-        {
-        case core::LogLevel::Info:    return "INFO";
-        case core::LogLevel::Warning: return "WARN";
-        case core::LogLevel::Error:   return "ERROR";
-        default:                      return "UNKNOWN";
-        }
-    }
-}
-
 namespace core
 {
+    namespace
+    {
+        std::ofstream g_logFile;
+        std::mutex g_logMutex;
+        bool g_initialized = false;
+
+        const char* ToString(LogLevel level)
+        {
+            switch (level)
+            {
+            case LogLevel::Info:    return "INFO";
+            case LogLevel::Warning: return "WARN";
+            case LogLevel::Error:   return "ERROR";
+            default:                return "UNKNOWN";
+            }
+        }
+    }
+
     void Logger::Init(const std::string& logFilePath)
     {
         std::lock_guard<std::mutex> lock(g_logMutex);
@@ -45,10 +45,7 @@ namespace core
 
         g_initialized = false;
     }
-}
 
-namespace core
-{
     void Logger::Log(LogLevel level, const std::string& message)
     {
         Write(level, message);
@@ -68,10 +65,7 @@ namespace core
     {
         Write(LogLevel::Error, message);
     }
-}
 
-namespace core
-{
     void Logger::Write(LogLevel level, const std::string& message)
     {
         std::lock_guard<std::mutex> lock(g_logMutex);
@@ -83,11 +77,13 @@ namespace core
         char timeBuffer[26]; // Allocate memory buffer (ctime_s = 26 characters)
         ctime_s(timeBuffer, sizeof(timeBuffer), &now);
 
-        timeBuffer[24] = '\0'; // Remove trailing newline
+        timeBuffer[24] = '\0'; // Remove trailing newline added by ctime_s
 
-        std::string line = "[" + std::string(timeBuffer) + "]" + "[" +
-                           ToString(level) + "] " + message;
-        
+        std::string line =
+            "[" + std::string(timeBuffer) + "]" +
+            "[" + ToString(level) + "] " +
+            message;
+
         std::cout << line << std::endl;
 
         if (g_logFile.is_open())
