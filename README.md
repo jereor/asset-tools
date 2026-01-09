@@ -1,20 +1,20 @@
-\# AssetTools — Internal Game Development Tools Prototype
+# AssetTools — Internal Game Development Tools Prototype
 
 
 
-AssetTools is a C++ prototype of an \*\*internal game development tool\*\* designed to support \*\*content creation workflows, asset pipelines, and shared engine technology\*\*.
+AssetTools is a C++ prototype of an **internal game development tool** designed to support **content creation workflows, asset pipelines, and shared engine technology**.
 
 
 
-The project is intentionally scoped as a \*\*tools-side application\*\*, not a game runtime. Its focus is on:
+The project is intentionally scoped as a **tools-side application**, not a game runtime. Its focus is on:
 
-\- Developer productivity
+- Developer productivity
 
-\- Robust pipelines
+- Robust pipelines
 
-\- Clear ownership between engine modules and tools
+- Clear ownership between engine modules and tools
 
-\- Maintainable, extensible C++ infrastructure
+- Maintainable, extensible C++ infrastructure
 
 
 
@@ -26,7 +26,7 @@ This mirrors the type of internal tools used by game studios to support artists,
 
 
 
-\## 🎯 Project Goals
+## 🎯 Project Goals
 
 
 
@@ -34,19 +34,19 @@ The primary goals of AssetTools are:
 
 
 
-\- Provide a \*\*shared core library\*\* used by multiple tools
+- Provide a **shared core library** used by multiple tools
 
-\- Demonstrate \*\*target-based CMake project structure\*\*
+- Demonstrate **target-based CMake project structure**
 
-\- Implement \*\*production-style logging\*\* suitable for automated pipelines
+- Implement **production-style logging** suitable for automated pipelines
 
-\- Lay the foundation for editor and asset workflow tools
+- Lay the foundation for editor and asset workflow tools
 
-\- Emphasize \*\*stability, clarity, and maintainability\*\* over cleverness
+- Emphasize **stability, clarity, and maintainability** over cleverness
 
 
 
-This project is built as a learning-focused but \*\*industry-realistic\*\* prototype.
+This project is built as a learning-focused but **industry-realistic** prototype.
 
 
 
@@ -54,7 +54,7 @@ This project is built as a learning-focused but \*\*industry-realistic\*\* proto
 
 
 
-\## 🧩 Project Structure
+## 🧩 Project Structure
 
 
 
@@ -96,17 +96,17 @@ AssetTools/
 
 
 
-\### `core`
+### `core`
 
-Represents \*\*shared technology\*\* similar to an internal engine or common tools library.  
+Represents **shared technology** similar to an internal engine or common tools library.  
 
-It is built as a \*\*static library\*\* and is intended to be reused by multiple tools.
+It is built as a **static library** and is intended to be reused by multiple tools.
 
 
 
-\### `app`
+### `app`
 
-The actual \*\*tool executable\*\*, representing a command-line or editor-side utility that would be used in production workflows.
+The actual **tool executable**, representing a command-line or editor-side utility that would be used in production workflows.
 
 
 
@@ -114,25 +114,25 @@ The actual \*\*tool executable\*\*, representing a command-line or editor-side u
 
 
 
-\## 🔧 Build System
+## 🔧 Build System
 
 
 
-\- \*\*CMake (target-based)\*\*
+- **CMake (target-based)**
 
-\- \*\*Out-of-source builds\*\*
+- **Out-of-source builds**
 
-\- \*\*Static library + executable architecture\*\*
+- **Static library + executable architecture**
 
-\- Designed to scale to multiple tools and codebases
+- Designed to scale to multiple tools and codebases
 
 
 
-\### Build Instructions (Windows, Visual Studio)
+### Build Instructions (Windows, Visual Studio)
 
 
 
 CLI - Use the build.bat through Developer Command Prompt for VS
 
-File Explorer - Use the build\_interactive.bat
+File Explorer - Use the build_interactive.bat
 
