@@ -1,8 +1,9 @@
 add_library(core STATIC
-    src/Version.cpp
-    src/Logger.cpp
+    src/AssetParser.cpp
     src/AssetValidator.cpp
+    src/Logger.cpp
     src/TextureSizeRule.cpp
+    src/Version.cpp
 )
 
 target_include_directories(core

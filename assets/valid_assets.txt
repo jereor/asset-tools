@@ -1,0 +1,4 @@
+Texture PlayerIcon 256
+Texture BackgroundTile 512
+Audio ButtonClick 64
+Audio ExplosionSmall 512
