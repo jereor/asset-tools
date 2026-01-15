@@ -4,6 +4,7 @@
 
 #include "ScanMode.h"
 #include "ValidateMode.h"
+#include "InspectMode.h"
 
 #include <vector>
 #include <string>
@@ -65,6 +66,10 @@ int main(int argc, char* argv[])
     else if (args[0] == "validate")
     {
         mode = std::make_unique<ValidateMode>();
+    }
+    else if (args[0] == "inspect")
+    {
+        mode = std::make_unique<InspectMode>();
     }
     else
     {
