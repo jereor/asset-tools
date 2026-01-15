@@ -88,15 +88,18 @@ They do **not** represent real game content.
 
 AssetTools validate <asset_file>
 
-Example:
-
-AssetTools validate ../../assets/invalid_assets.txt
-
 Behavior:
 - Parses asset definitions from the input file
 - Applies rule-based validation
-- Logs actionable errors
-- Returns appropriate exit codes for pipeline use
+- Logs rule violations
+
+### Inspect Assets
+
+AssetTools inspect <asset_file>
+
+Behavior:
+- Retrieves asset metadata from the input file
+- Logs asset metadata, including file extension, file size, and last-modified timestamp
 
 ---
 
