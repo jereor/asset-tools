@@ -104,6 +104,21 @@ namespace
     }
 }
 
+namespace
+{
+    bool g_validateRegistered = ToolModeFactory::Register(InspectMode::GetFactoryName(), InspectMode::Create);
+}
+
+ std::string InspectMode::GetFactoryName()
+ {
+     return "inspect";
+ }
+
+  std::unique_ptr<ToolMode> InspectMode::Create()
+ {
+    return std::make_unique<InspectMode>();
+ }
+
 core::ExitCode InspectMode::Run(const std::vector<std::string>& args)
 {
     if (args.size() != 1)

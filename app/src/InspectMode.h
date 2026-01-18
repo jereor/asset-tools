@@ -1,8 +1,16 @@
 #pragma once
 #include "ToolMode.h"
 
-class InspectMode : public ToolMode
+#include "ToolModeFactory.h"
+
+#include <string>
+#include <memory>
+
+class InspectMode final : public ToolMode
 {
 public:
     core::ExitCode Run(const std::vector<std::string>& args) override;
+
+    static std::string GetFactoryName();
+    static std::unique_ptr<ToolMode> Create();
 };

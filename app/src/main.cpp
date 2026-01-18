@@ -2,6 +2,7 @@
 #include "core/Logger.h"
 #include "core/ExitCode.h"
 
+#include "ToolModeFactory.h"
 #include "ScanMode.h"
 #include "ValidateMode.h"
 #include "InspectMode.h"
@@ -21,6 +22,7 @@ namespace
             "  AssetTools <mode> [options]\n\n"
             "Modes:\n"
             "  scan        Scan assets\n"
+            "  inspect     Inspect asset metadata\n"
             "  validate    Validate assets\n\n"
             "Options:\n"
             "  --help       Show this help message\n"
@@ -57,23 +59,20 @@ int main(int argc, char* argv[])
         return static_cast<int>(core::ExitCode::Success);
     }
 
-    std::unique_ptr<ToolMode> mode;
+    std::unique_ptr<ToolMode> mode = ToolModeFactory::Create(args[0]);
 
-    if (args[0] == "scan")
-    {
-        mode = std::make_unique<ScanMode>();
-    }
-    else if (args[0] == "validate")
-    {
-        mode = std::make_unique<ValidateMode>();
-    }
-    else if (args[0] == "inspect")
-    {
-        mode = std::make_unique<InspectMode>();
-    }
-    else
+    if (mode == nullptr)
     {
         core::Logger::Error("Unknown mode: " + args[0]);
+        
+        auto availableModes = ToolModeFactory::GetAvailableModes();
+        if (!availableModes.empty())
+        {
+            core::Logger::Info("Available modes:");
+            for (const auto& modeName : availableModes)
+                core::Logger::Info("  - " + modeName);
+        }
+        
         PrintHelp();
         core::Logger::Shutdown();
         return static_cast<int>(core::ExitCode::InvalidArguments);

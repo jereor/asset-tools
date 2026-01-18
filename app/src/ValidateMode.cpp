@@ -7,6 +7,21 @@
 
 #include <fstream>
 
+namespace
+{
+    bool g_validateRegistered = ToolModeFactory::Register(ValidateMode::GetFactoryName(), ValidateMode::Create);
+}
+
+ std::string ValidateMode::GetFactoryName()
+ {
+     return "validate";
+ }
+
+  std::unique_ptr<ToolMode> ValidateMode::Create()
+ {
+    return std::make_unique<ValidateMode>();
+ }
+
 core::ExitCode ValidateMode::Run(const std::vector<std::string>& args)
 {
     if (args.size() != 1)
@@ -15,7 +30,7 @@ core::ExitCode ValidateMode::Run(const std::vector<std::string>& args)
                             "Usage: AssetTools validate <asset_file>");
         return core::ExitCode::InvalidArguments;
     }
-
+    
     std::ifstream file(args[0]);
     if (!file)
     {
