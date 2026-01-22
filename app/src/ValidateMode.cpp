@@ -6,36 +6,40 @@
 #include "core/TextureSizeRule.h"
 
 #include <fstream>
+#include <vector>
 
 namespace
 {
     bool g_validateRegistered = ToolModeFactory::Register(ValidateMode::GetFactoryName(), ValidateMode::Create);
 }
 
- std::string ValidateMode::GetFactoryName()
- {
-     return "validate";
- }
-
-  std::unique_ptr<ToolMode> ValidateMode::Create()
- {
-    return std::make_unique<ValidateMode>();
- }
-
-core::ExitCode ValidateMode::Run(const std::vector<std::string>& args)
+std::string ValidateMode::GetFactoryName()
 {
+    return "validate";
+}
+
+std::unique_ptr<ToolMode> ValidateMode::Create()
+{
+    return std::make_unique<ValidateMode>();
+}
+
+core::ToolResult ValidateMode::Run(const std::vector<std::string>& args)
+{
+    core::ToolResult toolResult;
+
     if (args.size() != 1)
     {
-        core::Logger::Error("AssetTools validate requires an asset file path\n"
-                            "Usage: AssetTools validate <asset_file>");
-        return core::ExitCode::InvalidArguments;
+		toolResult.AddError("Invalid number of arguments. Expected 1 argument: <asset_file>");
+		toolResult.exitCode = core::ExitCode::InvalidArguments;
+        return toolResult;
     }
     
     std::ifstream file(args[0]);
     if (!file)
     {
-        core::Logger::Error("Failed to open asset file: " + args[0]);
-        return core::ExitCode::ToolFailure;
+        toolResult.AddError("Failed to open asset file: " + args[0]);
+        toolResult.exitCode = core::ExitCode::ToolFailure;
+        return toolResult;
     }
 
     core::AssetParser parser;
@@ -50,7 +54,7 @@ core::ExitCode ValidateMode::Run(const std::vector<std::string>& args)
         auto parseResult = parser.ParseLine(line);
         if (!parseResult.asset)
         {
-            core::Logger::Error(parseResult.error);
+            toolResult.AddError(parseResult.error);
             hasErrors = true;
             continue;
         }
@@ -58,16 +62,17 @@ core::ExitCode ValidateMode::Run(const std::vector<std::string>& args)
         auto results = validator.Validate(*parseResult.asset);
         for (const auto& result : results)
         {
-            core::Logger::Error(result.message);
+            toolResult.AddError(result.message);
             hasErrors = true;
         }
     }
 
     if (hasErrors)
     {
-        return core::ExitCode::ToolFailure;
+		toolResult.exitCode = core::ExitCode::ToolFailure;
+        return toolResult;
     }
 
-    core::Logger::Info("All assets validated successfully");
-    return core::ExitCode::Success;
+    toolResult.exitCode = core::ExitCode::Success;
+    return toolResult;
 }

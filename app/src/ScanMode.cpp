@@ -19,12 +19,14 @@ namespace
     return std::make_unique<ScanMode>();
  }
 
-core::ExitCode ScanMode::Run(const std::vector<std::string>& args)
+core::ToolResult ScanMode::Run(const std::vector<std::string>& args)
 {
-    core::Logger::Info("Running scan mode");
+    core::ToolResult toolResult;
+    toolResult.AddInfo("Running scan mode");
 
     // TODO: Implement asset scanning
-    core::Logger::Info("Scanning assets...");
+    toolResult.AddInfo("Scanning assets...");
 
-    return core::ExitCode::Success;
+	toolResult.exitCode = core::ExitCode::Success;
+    return toolResult;
 }

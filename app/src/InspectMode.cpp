@@ -119,42 +119,48 @@ namespace
     return std::make_unique<InspectMode>();
  }
 
-core::ExitCode InspectMode::Run(const std::vector<std::string>& args)
+core::ToolResult InspectMode::Run(const std::vector<std::string>& args)
 {
+    core::ToolResult toolResult;
+
     if (args.size() != 1)
     {
-        core::Logger::Error("AssetTools inspect expects exactly 1 argument\n"
-                            "Usage: AssetTools inspect <asset_path>");
-        return core::ExitCode::InvalidArguments;
+        toolResult.AddError("Invalid number of arguments. Expected 1 argument: <asset_path>");
+        toolResult.exitCode = core::ExitCode::InvalidArguments;
+		return toolResult;
     }
 
     std::filesystem::path assetPath{args[0]};
     if (!std::filesystem::exists(assetPath))
     {
-        core::Logger::Error("Asset does not exist: " + assetPath.string());
-        return core::ExitCode::FileNotFound;
+        toolResult.AddError("Asset not found: " + assetPath.string());
+        toolResult.exitCode = core::ExitCode::FileNotFound;
+        return toolResult;
     }
 
     if (!std::filesystem::is_regular_file(assetPath))
     {
-        core::Logger::Error("Path is not a regular file: " + assetPath.string());
-        return core::ExitCode::InvalidArguments;
+        toolResult.AddError("The specified path is not a regular file: " + assetPath.string());
+        toolResult.exitCode = core::ExitCode::InvalidArguments;
+        return toolResult;
     }
 
     auto fileExt = GetFileExtension(assetPath);
     if (!IsSupportedExtension(fileExt))
     {
-        core::Logger::Error("Unsupported file extension: " + fileExt);
-		core::Logger::Info("Supported extensions: " + SupportedExtensionsToString());
-        return core::ExitCode::UnsupportedFormat;
+        toolResult.AddError("Unsupported file extension: " + fileExt);
+        toolResult.AddInfo("Supported extensions: " + SupportedExtensionsToString());
+        toolResult.exitCode = core::ExitCode::UnsupportedFormat;
+        return toolResult;
     }
 
     std::uintmax_t fileSize = std::filesystem::file_size(assetPath);
 
-    core::Logger::Info("Asset inspection result:");
-    core::Logger::Info("  Name: " + assetPath.filename().string());
-    core::Logger::Info("  Extension: " + fileExt);
-    core::Logger::Info("  Size: " + FileSizeToString(fileSize));
-    core::Logger::Info("  Last Modified: " + LastWriteTimeToString(assetPath));
-    return core::ExitCode::Success;
+    toolResult.AddInfo("Asset inspection result:");
+    toolResult.AddInfo("  Name: " + assetPath.filename().string());
+    toolResult.AddInfo("  Extension: " + fileExt);
+    toolResult.AddInfo("  Size: " + FileSizeToString(fileSize));
+    toolResult.AddInfo("  Last Modified: " + LastWriteTimeToString(assetPath));
+    toolResult.exitCode = core::ExitCode::Success;
+    return toolResult;
 }

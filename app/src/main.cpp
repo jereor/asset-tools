@@ -82,6 +82,22 @@ int main(int argc, char* argv[])
         std::vector<std::string>(args.begin() + 1, args.end())
     );
 
+    for each(core::Diagnostic diagnostic in result.diagnostics)
+    {
+        switch (diagnostic.level)
+        {
+            case core::LogLevel::Info:
+                core::Logger::Info(diagnostic.message);
+			    break;
+            case core::LogLevel::Warning:
+				core::Logger::Warning(diagnostic.message);
+                break;
+			case core::LogLevel::Error:
+                core::Logger::Error(diagnostic.message);
+				break;
+        }
+    }
+
     core::Logger::Shutdown();
-    return static_cast<int>(result);
+    return static_cast<int>(result.exitCode);
 }
