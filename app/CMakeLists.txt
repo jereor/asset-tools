@@ -1,9 +1,9 @@
 add_executable(AssetTools
-    src/InspectMode.cpp
     src/main.cpp
-    src/ScanMode.cpp
-    src/ToolModeFactory.cpp
-    src/ValidateMode.cpp
+    src/modes/InspectMode.cpp
+    src/modes/ScanMode.cpp
+    src/modes/ToolModeFactory.cpp
+    src/modes/ValidateMode.cpp
 )
 
 target_link_libraries(AssetTools

@@ -2,10 +2,10 @@
 #include "core/Logger.h"
 #include "core/ExitCode.h"
 
-#include "ToolModeFactory.h"
-#include "ScanMode.h"
-#include "ValidateMode.h"
-#include "InspectMode.h"
+#include "modes/ToolModeFactory.h"
+#include "modes/ScanMode.h"
+#include "modes/ValidateMode.h"
+#include "modes/InspectMode.h"
 
 #include <vector>
 #include <string>
