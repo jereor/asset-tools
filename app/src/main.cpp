@@ -82,7 +82,7 @@ int main(int argc, char* argv[])
         std::vector<std::string>(args.begin() + 1, args.end())
     );
 
-    for each(core::Diagnostic diagnostic in result.diagnostics)
+    for (const core::Diagnostic& diagnostic : result.diagnostics)
     {
         switch (diagnostic.level)
         {
