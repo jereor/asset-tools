@@ -1,17 +1,17 @@
 cmake_minimum_required(VERSION 3.16...4.2)
-project(AssetTools)
+project(AssetTools VERSION 1.0.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# Find and link yaml-cpp, fetch from Git if not found
 include(FetchContent)
-
-# Include yaml-cpp
 FetchContent_Declare(
   yaml-cpp
   GIT_REPOSITORY https://github.com/jbeder/yaml-cpp.git
   GIT_TAG c9371de7836d113c0b14bfa15ca70f00ebb3ac6f  # 2025-4-30, post 0.8.0 CMake fix
+  FIND_PACKAGE_ARGS
 )
-set(CMAKE_POLICY_DEFAULT_CMP0169 OLD)
 FetchContent_MakeAvailable(yaml-cpp)
 
 # Suppress warnings for third-party libraries
