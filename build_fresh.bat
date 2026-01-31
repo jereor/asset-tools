@@ -11,7 +11,7 @@ if exist build (
 )
 
 cmake -S . -B build || exit /b 1
-cmake --build build --parallel || exit /b 1
+cmake --build build --config Release --parallel || exit /b 1
 
 echo Build completed successfully.
 endlocal
