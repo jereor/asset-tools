@@ -8,4 +8,5 @@ add_executable(AssetTools
 
 target_link_libraries(AssetTools
     PRIVATE core
+    PRIVATE yaml-cpp::yaml-cpp
 )
