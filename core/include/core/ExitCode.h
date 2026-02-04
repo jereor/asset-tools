@@ -12,6 +12,10 @@ namespace core
         InvalidArguments = 100,
         FileNotFound = 101,
         UnsupportedFormat = 102,
+        ValidationFailed = 103,
+        ConfigNotFound = 104,
+        ConfigParseError = 105,
+        ConfigValidationError = 106,
 
         ToolFailure = 200,
     };
@@ -27,7 +31,7 @@ namespace core
     {
         int value = static_cast<int>(exitCode);
         if (value == 0) return ExitCodeCategory::Success;
-        if (value < 100) return ExitCodeCategory::UserError;
+        if (value < 200) return ExitCodeCategory::UserError;
         return ExitCodeCategory::ToolError;
     }
 }

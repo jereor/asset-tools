@@ -18,9 +18,9 @@ std::string ValidateMode::GetFactoryName()
     return "validate";
 }
 
-std::unique_ptr<ToolMode> ValidateMode::Create()
+std::unique_ptr<ToolMode> ValidateMode::Create(const ToolConfig& config)
 {
-    return std::make_unique<ValidateMode>();
+    return std::make_unique<ValidateMode>(config);
 }
 
 core::ToolResult ValidateMode::Run(const std::vector<std::string>& args)

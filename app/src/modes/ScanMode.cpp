@@ -14,9 +14,9 @@ namespace
      return "scan";
  }
 
-  std::unique_ptr<ToolMode> ScanMode::Create()
+  std::unique_ptr<ToolMode> ScanMode::Create(const ToolConfig& config)
  {
-    return std::make_unique<ScanMode>();
+    return std::make_unique<ScanMode>(config);
  }
 
 core::ToolResult ScanMode::Run(const std::vector<std::string>& args)

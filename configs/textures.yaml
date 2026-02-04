@@ -1,0 +1,11 @@
+metadata:
+  name: "texture-validation-config"
+  description: "Configurations for texture asset validation"
+  version: 1.0
+
+textures:
+  maxSizeKb: 2048
+  allowedFormats:
+    - png
+    - jpg
+  mipmapsRequired: true

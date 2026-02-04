@@ -1,14 +1,14 @@
 #include "ToolModeFactory.h"
 
-std::unordered_map<std::string, std::unique_ptr<ToolMode>(*)()>& ToolModeFactory::GetModesMap()
+std::unordered_map<std::string, ToolModeFactory::CreateMethod>& ToolModeFactory::GetModesMap()
 {
 	// Static local variables are initialized on first use
 	// This guarantees s_modes exists before any registration
-	static std::unordered_map<std::string, std::unique_ptr<ToolMode>(*)()> s_modes;
+	static std::unordered_map<std::string, ToolModeFactory::CreateMethod> s_modes;
 	return s_modes;
 }
 
-bool ToolModeFactory::Register(const std::string& name, std::unique_ptr<ToolMode>(*createMethod)())
+bool ToolModeFactory::Register(const std::string& name, CreateMethod createMethod)
 {
 	auto& modes = GetModesMap();
 	
@@ -20,12 +20,12 @@ bool ToolModeFactory::Register(const std::string& name, std::unique_ptr<ToolMode
 	return false;
 }
 
-std::unique_ptr<ToolMode> ToolModeFactory::Create(const std::string& name)
+std::unique_ptr<ToolMode> ToolModeFactory::Create(const std::string& name, const ToolConfig& toolConfig)
 {
 	auto& modes = GetModesMap();
 
 	if (auto it = modes.find(name); it != modes.end())
-		return it->second(); // call the Create function
+		return it->second(toolConfig); // call the Create function
 
 	return nullptr;
 }

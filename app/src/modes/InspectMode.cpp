@@ -114,9 +114,9 @@ namespace
      return "inspect";
  }
 
-  std::unique_ptr<ToolMode> InspectMode::Create()
+  std::unique_ptr<ToolMode> InspectMode::Create(const ToolConfig& config)
  {
-    return std::make_unique<InspectMode>();
+    return std::make_unique<InspectMode>(config);
  }
 
 core::ToolResult InspectMode::Run(const std::vector<std::string>& args)

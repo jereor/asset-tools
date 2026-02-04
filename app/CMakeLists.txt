@@ -4,7 +4,15 @@ add_executable(AssetTools
     src/modes/ScanMode.cpp
     src/modes/ToolModeFactory.cpp
     src/modes/ValidateMode.cpp
-)
+    src/config/ConfigLoader.cpp)
+
+
+# Enable strict warnings
+if(MSVC)
+    target_compile_options(AssetTools PRIVATE /W4)
+else()
+    target_compile_options(AssetTools PRIVATE -Wall -Wextra -Wpedantic)
+endif()
 
 target_link_libraries(AssetTools
     PRIVATE core

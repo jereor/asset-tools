@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <algorithm>
+#include <format>
 
 namespace core
 {
@@ -31,6 +32,24 @@ namespace core
         void AddError(std::string msg)
         {
             AddDiagnostic(core::LogLevel::Error, std::move(msg));
+        }
+
+        template<typename... Args>
+        void AddInfo(std::format_string<Args...> fmt, Args&&... args)
+        {
+            AddDiagnostic(core::LogLevel::Info, std::format(fmt, std::forward<Args>(args)...));
+        }
+
+        template<typename... Args>
+        void AddWarning(std::format_string<Args...> fmt, Args&&... args)
+        {
+            AddDiagnostic(core::LogLevel::Warning, std::format(fmt, std::forward<Args>(args)...));
+        }
+
+        template<typename... Args>
+        void AddError(std::format_string<Args...> fmt, Args&&... args)
+        {
+            AddDiagnostic(core::LogLevel::Error, std::format(fmt, std::forward<Args>(args)...));
         }
 
         bool HasErrors() const noexcept
