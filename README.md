@@ -25,7 +25,8 @@ The primary goals of AssetTools are to:
 - Demonstrate a **target-based CMake project structure**
 - Implement **production-style logging** suitable for automated pipelines
 - Validate asset data using **rule-based, data-driven systems**
-- Emphasize **stability, clarity, and maintainability** over cleverness
+- Provide an easy-to-use **configuration** layer
+- Be **easy to understand and use** by artists, designers, engineers and CI
 
 This project is learning-focused, but intentionally designed to be
 **industry-realistic** and representative of professional tools code.
@@ -36,32 +37,22 @@ This project is learning-focused, but intentionally designed to be
 
 AssetTools/ 
 
+├── app/         # Tool executable and mode-based command-line logic
+
+├── assets/      # Sample asset data used for validation and testing
+
+├── build/       # Out-of-source build artifacts (generated)
+
+├── configs/     # YAML configuration files to configure tool behavior and validation rules
+
 ├── core/        # Shared engine-style core library (logging, assets, validation)
 
-├── app/         # Tool executable and mode-based command-line logic 
-
-├── assets/      # Sample asset data used for validation and testing 
-
-├── build/       # Out-of-source build artifacts (generated) 
-
-└── CMakeLists.txt  # Top-level CMake project configuration 
-
-### `core`
-
-Represents **shared technology** similar to an internal engine or common
-tools library.
-
-- Built as a **static library**
-- Contains reusable systems (logging, asset definitions, validation)
-- Designed to be consumed by multiple tools or editors
-
-This mirrors how studios structure shared tooling and engine-side code.
-
----
+└── CMakeLists.txt  # Top-level CMake project configuration
 
 ### `app`
 
 The **tool executable**, implemented as a command-line utility.
+Can be extended with a GUI later on.
 
 It supports **multiple modes** and acts as a pipeline-facing tool that
 can be invoked by developers, scripts, or CI systems.
@@ -70,17 +61,57 @@ can be invoked by developers, scripts, or CI systems.
 
 ### `assets`
 
-Contains **small, text-based sample asset definitions** used to
+Contains **sample assets** used to
 demonstrate and test the validation pipeline.
 
-These files are:
-- Intentionally minimal
-- Deterministic
-- Included for demonstration and testing only
-
-They do **not** represent real game content.
+These files are included for demonstration and testing only.
 
 ---
+
+### `build`
+
+Generated with CMake / build scripts. 
+Navigate to app/Release or app/Debug to find the executable.
+
+---
+
+### `configs`
+
+Contains **YAML configuration files** to configure tool behavior and validation rules.
+Passed into the tool as CLI arguments. (eg. --config path/to/config)
+
+Config layers (in order of precedence)
+1. Built-in defaults (code)
+2. Base project config (base.yaml) - Defines project-wide rules that apply to everything
+3. Category config (textures.yaml, audio.yaml, …) - Override or extend base rules per asset category
+4. [Planned] Asset-level metadata (.meta files) - Override rules for specific assets
+
+Each layer:
+- Is optional except base.yaml
+- Overrides values from previous layers
+
+---
+
+### `core`
+
+Represents **shared technology** similar to an internal engine or common
+tools library.
+
+- Built as a **static library**
+- Contains reusable systems (logging, exit codes, asset parsing)
+- Designed to be consumed by multiple tools or editors
+
+This mirrors how studios structure shared tooling and engine-side code.
+
+---
+
+### `CMakeLists.txt`
+
+Used by CMake to define the project's source files, build targets, and configuration options. 
+It contains rules for the build process, allowing CMake to generate the necessary files for building the executable.
+
+---
+
 
 ## 🛠 Tool Usage
 
@@ -110,24 +141,50 @@ Behavior:
 - **Static library + executable architecture**
 - Designed to scale to multiple tools and shared codebases
 
-### Build Instructions (Windows, Visual Studio)
+### Build Instructions (Windows)
 
-- CLI: use `build.bat` from a Developer Command Prompt for Visual Studio
+- CLI: use `build.bat` in Visual Studio or Visual Studio Code
 - File Explorer: use `build_interactive.bat`
+
+### Build Instructions (Mac or Linux)
+Navigate to the 'asset-tools' folder and run the following commands:
+- cmake -S . -B build
+- cmake --build build --config Release --parallel
 
 ---
 
 ## 🧠 Design Philosophy
 
-AssetTools prioritizes:
-
-- Explicit ownership and lifetimes
-- Clear contracts between systems
-- Data-driven validation over hardcoded logic
-- Predictable behavior in automated pipelines
+AssetTools is designed to be:
+- Engine-agnostic (not Unity / Unreal specific)
+- Pre-engine (runs before assets enter an editor)
+- CI-friendly (clear exit codes, deterministic behavior)
+- Developer-first (clear diagnostics, predictable configuration)
 
 The project is intentionally designed to resemble **real internal tools** 
-used by studios.
+used by studios across many projects with different game engines and practices.
+
+YAML files
+
+   ↓
+
+ConfigLoader
+
+   ↓  (schema validation only)
+
+Typed C++ config structs
+
+   ↓
+
+Tool modes (inspect / validate)
+
+   ↓
+
+Diagnostics
+
+   ↓
+
+App decides exit code & output
 
 ---
 
