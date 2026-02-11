@@ -7,6 +7,9 @@
 
 #include <fstream>
 #include <vector>
+#include <filesystem>
+#include <string>
+#include <unordered_set>
 
 namespace
 {
@@ -23,6 +26,20 @@ std::unique_ptr<ToolMode> ValidateMode::Create(const ToolConfig& config)
     return std::make_unique<ValidateMode>(config);
 }
 
+namespace
+{
+    std::string GetFileExtension(const std::filesystem::path& filePath)
+    {
+        std::string ext = filePath.extension().string();
+
+        // Convert extension to lowercase (for case-insensitive match)
+        std::transform(ext.begin(), ext.end(), ext.begin(),
+            [](unsigned char c) { return std::tolower(c); });
+
+        return ext;
+    }
+}
+
 core::ToolResult ValidateMode::Run(const std::vector<std::string>& args)
 {
     core::ToolResult toolResult;
@@ -33,11 +50,20 @@ core::ToolResult ValidateMode::Run(const std::vector<std::string>& args)
 		toolResult.exitCode = core::ExitCode::InvalidArguments;
         return toolResult;
     }
+
+    std::string fileExt = GetFileExtension(args[0]);
+    if (fileExt != ".txt")
+    {
+        toolResult.AddError("Unsupported file extension: {}", fileExt);
+        toolResult.AddInfo("Only .txt files are supported for validation in this mode.");
+        toolResult.exitCode = core::ExitCode::UnsupportedFormat;
+        return toolResult;
+    }
     
     std::ifstream file(args[0]);
     if (!file)
     {
-        toolResult.AddError("Failed to open asset file: " + args[0]);
+        toolResult.AddError("Failed to open asset file: {}", args[0]);
         toolResult.exitCode = core::ExitCode::ToolFailure;
         return toolResult;
     }
@@ -51,7 +77,7 @@ core::ToolResult ValidateMode::Run(const std::vector<std::string>& args)
 
     while (std::getline(file, line))
     {
-        auto parseResult = parser.ParseLine(line);
+        core::ParseResult parseResult = parser.ParseLine(line);
         if (!parseResult.asset)
         {
             toolResult.AddError(parseResult.error);
@@ -59,8 +85,8 @@ core::ToolResult ValidateMode::Run(const std::vector<std::string>& args)
             continue;
         }
 
-        auto results = validator.Validate(*parseResult.asset);
-        for (const auto& result : results)
+        std::vector<core::ValidationResult> results = validator.Validate(*parseResult.asset);
+        for (const core::ValidationResult& result : results)
         {
             toolResult.AddError(result.message);
             hasErrors = true;
@@ -73,6 +99,7 @@ core::ToolResult ValidateMode::Run(const std::vector<std::string>& args)
         return toolResult;
     }
 
+    toolResult.AddInfo("Asset validation completed successfully with no errors.");
     toolResult.exitCode = core::ExitCode::Success;
     return toolResult;
 }
