@@ -15,14 +15,14 @@ namespace core
     class Logger
     {
     public:
-        static void Init(const std::string& logFilePath);
+        static void Init(std::string_view logFilePath);
         static void Shutdown();
 
-        static void Log(LogLevel level, const std::string& message);
+        static void Log(LogLevel level, std::string_view message);
 
-        static void Info(const std::string& message);
-        static void Warning(const std::string& message);
-        static void Error(const std::string& message);
+        static void Info(std::string_view message);
+        static void Warning(std::string_view message);
+        static void Error(std::string_view message);
 
         template<typename... Args>
         static void Info(std::format_string<Args...> fmt, Args&&... args)
@@ -43,6 +43,6 @@ namespace core
         }
 
     private:
-        static void Write(LogLevel level, const std::string& message);
+        static void Write(LogLevel level, std::string_view message);
     };
 }

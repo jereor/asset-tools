@@ -22,17 +22,14 @@ namespace
         return ext;
     }
 
-    static const std::unordered_set<std::string> supportedExtensions = {
-            ".png",
-            ".jpg",
-            ".wav",
-            ".fbx",
-            ".json"
+    static constexpr std::string_view supportedExtensions[] = {
+        ".png", ".jpg", ".wav", ".fbx", ".json"
     };
 
-    bool IsSupportedExtension(const std::string& ext)
+    bool IsSupportedExtension(std::string_view ext)
     {
-        return supportedExtensions.find(ext) != supportedExtensions.end();
+        return std::find(std::begin(supportedExtensions),  std::end(supportedExtensions), ext) 
+                != std::end(supportedExtensions);
     }
 
     std::string SupportedExtensionsToString()
@@ -40,7 +37,7 @@ namespace
         std::ostringstream out;
         bool first = true;
 
-        for (const std::string& ext : supportedExtensions)
+        for (std::string_view ext : supportedExtensions)
         {
             if (!first)
                 out << ", ";
@@ -53,7 +50,7 @@ namespace
 
     std::string FileSizeToString(const std::uintmax_t& bytes)
     {
-        constexpr const char* units[] = { "B", "KB", "MB", "GB", "TB" };
+        constexpr std::string_view units[] = { "B", "KB", "MB", "GB", "TB" };
 
         double size = static_cast<double>(bytes);
         std::size_t unit = 0;

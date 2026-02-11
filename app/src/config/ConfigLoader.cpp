@@ -111,11 +111,11 @@ namespace YAML {
     };
 }
 
-std::expected<ToolConfig, core::ToolResult> ConfigLoader::LoadConfig(const std::string& configFilePath)
+std::expected<ToolConfig, core::ToolResult> ConfigLoader::LoadConfig(std::string_view configFilePath)
 {
     core::ToolResult toolResult;
     try {
-        YAML::Node configNode = YAML::LoadFile(configFilePath);
+        YAML::Node configNode = YAML::LoadFile(configFilePath.data());
         auto baseConfig = configNode.as<BaseConfig>();
         auto toolConfig = ToolConfig{ .baseConfig = baseConfig };
         return toolConfig;

@@ -7,5 +7,5 @@
 class ConfigLoader
 {
 public:
-	static std::expected<ToolConfig, core::ToolResult> LoadConfig(const std::string& configFilePath);
+	static std::expected<ToolConfig, core::ToolResult> LoadConfig(std::string_view configFilePath);
 };

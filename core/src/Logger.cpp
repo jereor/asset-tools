@@ -25,14 +25,14 @@ namespace core
         }
     }
 
-    void Logger::Init(const std::string& logFilePath)
+    void Logger::Init(std::string_view logFilePath)
     {
         std::lock_guard<std::mutex> lock(g_logMutex);
 
         if (g_initialized)
             return;
 
-        g_logFile.open(logFilePath, std::ios::out | std::ios::trunc);
+        g_logFile.open(logFilePath.data(), std::ios::out | std::ios::trunc);
         g_initialized = true;
     }
 
@@ -46,27 +46,27 @@ namespace core
         g_initialized = false;
     }
 
-    void Logger::Log(LogLevel level, const std::string& message)
+    void Logger::Log(LogLevel level, std::string_view message)
     {
         Write(level, message);
     }
 
-    void Logger::Info(const std::string& message)
+    void Logger::Info(std::string_view message)
     {
         Write(LogLevel::Info, message);
     }
 
-    void Logger::Warning(const std::string& message)
+    void Logger::Warning(std::string_view message)
     {
         Write(LogLevel::Warning, message);
     }
 
-    void Logger::Error(const std::string& message)
+    void Logger::Error(std::string_view message)
     {
         Write(LogLevel::Error, message);
     }
 
-    void Logger::Write(LogLevel level, const std::string& message)
+    void Logger::Write(LogLevel level, std::string_view message)
     {
         std::lock_guard<std::mutex> lock(g_logMutex);
 
@@ -82,7 +82,7 @@ namespace core
         std::string line =
             "[" + std::string(timeBuffer) + "]" +
             "[" + ToString(level) + "] " +
-            message;
+            message.data();
 
         std::cout << line << std::endl;
 

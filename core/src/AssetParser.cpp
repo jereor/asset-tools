@@ -4,7 +4,7 @@
 
 namespace core
 {
-    static AssetType ParseType(const std::string& token)
+    static AssetType ParseType(std::string_view token)
     {
         if (token == "Texture") return AssetType::Texture;
         if (token == "Audio") return AssetType::Audio;
