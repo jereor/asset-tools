@@ -29,11 +29,8 @@ namespace
             ".json"
     };
 
-    bool IsSupportedExtension(std::string ext)
+    bool IsSupportedExtension(const std::string& ext)
     {
-        if (ext.empty())
-            return false;
-
         return supportedExtensions.find(ext) != supportedExtensions.end();
     }
 
@@ -42,7 +39,7 @@ namespace
         std::ostringstream out;
         bool first = true;
 
-        for (const auto& ext : supportedExtensions)
+        for (const std::string& ext : supportedExtensions)
         {
             if (!first)
                 out << ", ";
@@ -53,7 +50,7 @@ namespace
         return out.str();
     }
 
-    std::string FileSizeToString(std::uintmax_t bytes)
+    std::string FileSizeToString(const std::uintmax_t& bytes)
     {
         constexpr const char* units[] = { "B", "KB", "MB", "GB", "TB" };
 
@@ -133,22 +130,22 @@ core::ToolResult InspectMode::Run(const std::vector<std::string>& args)
     std::filesystem::path assetPath{args[0]};
     if (!std::filesystem::exists(assetPath))
     {
-        toolResult.AddError("Asset not found: " + assetPath.string());
+        toolResult.AddError("Asset not found: {}", assetPath.string());
         toolResult.exitCode = core::ExitCode::FileNotFound;
         return toolResult;
     }
 
     if (!std::filesystem::is_regular_file(assetPath))
     {
-        toolResult.AddError("The specified path is not a regular file: " + assetPath.string());
+        toolResult.AddError("The specified path is not a regular file: {}", assetPath.string());
         toolResult.exitCode = core::ExitCode::InvalidArguments;
         return toolResult;
     }
 
-    auto fileExt = GetFileExtension(assetPath);
+    std::string fileExt  = GetFileExtension(assetPath);
     if (!IsSupportedExtension(fileExt))
     {
-        toolResult.AddError("Unsupported file extension: " + fileExt);
+        toolResult.AddError("Unsupported file extension: {}", fileExt);
         toolResult.AddInfo("Supported extensions: " + SupportedExtensionsToString());
         toolResult.exitCode = core::ExitCode::UnsupportedFormat;
         return toolResult;
@@ -157,10 +154,10 @@ core::ToolResult InspectMode::Run(const std::vector<std::string>& args)
     std::uintmax_t fileSize = std::filesystem::file_size(assetPath);
 
     toolResult.AddInfo("Asset inspection result:");
-    toolResult.AddInfo("  Name: " + assetPath.filename().string());
-    toolResult.AddInfo("  Extension: " + fileExt);
-    toolResult.AddInfo("  Size: " + FileSizeToString(fileSize));
-    toolResult.AddInfo("  Last Modified: " + LastWriteTimeToString(assetPath));
+    toolResult.AddInfo("  Name: {}", assetPath.filename().string());
+    toolResult.AddInfo("  Extension: {}", fileExt);
+    toolResult.AddInfo("  Size: {}", FileSizeToString(fileSize));
+    toolResult.AddInfo("  Last Modified: {}", LastWriteTimeToString(assetPath));
     toolResult.exitCode = core::ExitCode::Success;
     return toolResult;
 }
