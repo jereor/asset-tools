@@ -1,5 +1,6 @@
 #include "ValidateMode.h"
 
+#include "ToolModeFactory.h"
 #include "core/Logger.h"
 #include "core/AssetParser.h"
 #include "core/AssetValidator.h"

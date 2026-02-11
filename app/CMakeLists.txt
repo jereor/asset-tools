@@ -4,8 +4,10 @@ add_executable(AssetTools
     src/modes/ScanMode.cpp
     src/modes/ToolModeFactory.cpp
     src/modes/ValidateMode.cpp
-    src/config/ConfigLoader.cpp)
+    src/config/ConfigLoader.cpp
+)
 
+target_include_directories(AssetTools PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 # Enable strict warnings
 if(MSVC)

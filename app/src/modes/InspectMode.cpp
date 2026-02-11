@@ -1,5 +1,6 @@
 #include "InspectMode.h"
 
+#include "ToolModeFactory.h"
 #include "core/Logger.h"
 
 #include <filesystem>

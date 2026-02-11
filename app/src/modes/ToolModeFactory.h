@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ToolMode.h"
-#include "../config/ToolConfig.h"
+#include "config/ToolConfig.h"
 
 #include <vector>
 #include <string>

@@ -1,8 +1,7 @@
 #pragma once
-#include "ToolMode.h"
 
-#include "ToolModeFactory.h"
-#include "../config/ToolConfig.h"
+#include "ToolMode.h"
+#include "config/ToolConfig.h"
 
 #include <string>
 #include <memory>
