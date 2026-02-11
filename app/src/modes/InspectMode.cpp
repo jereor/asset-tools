@@ -74,11 +74,11 @@ namespace
     {
         try
         {
-            auto ftime = std::filesystem::last_write_time(filePath);
+            std::filesystem::file_time_type ftime = std::filesystem::last_write_time(filePath);
 
             // Convert filesystem clock to system_clock
             using namespace std::chrono;
-            auto sctp = time_point_cast<system_clock::duration>(
+            system_clock::time_point sctp = time_point_cast<system_clock::duration>(
                 ftime - decltype(ftime)::clock::now() + system_clock::now());
 
             std::time_t cftime = system_clock::to_time_t(sctp);
