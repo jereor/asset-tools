@@ -3,9 +3,9 @@ metadata:
   description: "Configurations for texture asset validation"
   version: 1.0
 
-textures:
-  maxSizeKb: 2048
+validation:
   allowedFormats:
     - png
     - jpg
+  maxSizeKb: 2048
   mipmapsRequired: true

@@ -18,7 +18,10 @@
 
 namespace
 {
-    constexpr const char* kDefaultConfigPath = "../../../configs/base.yaml";
+    const std::string kDefaultLogFilePath = "AssetTools.log";
+    const std::string kDefaultBaseConfigPath = "base.yaml";
+    const std::string kDefaultTextureConfigPath = "textures.yaml";
+    const std::string kDefaultAudioConfigPath = "audio.yaml";
 
     void PrintHelp()
     {
@@ -34,6 +37,12 @@ namespace
             "  --help       Show this help message\n"
             "  --version    Show version information\n";
     }
+
+    struct ConfigPaths {
+        std::string basePath;
+        std::string texturePath;
+        std::string audioPath;
+    };
 
     void LogDiagnostics(std::vector<core::Diagnostic> diagnostics)
     {
@@ -60,7 +69,7 @@ int main(int argc, char* argv[])
     // Convert argv into a safer container
     std::vector<std::string> args(argv + 1, argv + argc);
 
-    core::Logger::Init("AssetTools.log");
+    core::Logger::Init(kDefaultLogFilePath);
 
     if (args.empty())
     {
@@ -84,31 +93,84 @@ int main(int argc, char* argv[])
         return static_cast<int>(core::ExitCode::Success);
     }
 
-    std::string configPath;
-    auto configIt = std::find(args.begin(), args.end(), "--config");
-    if (configIt != args.end() && std::next(configIt) != args.end()) {
-        core::Logger::Info("Using config file from command line argument: {}", *std::next(configIt));
-        configPath = *std::next(configIt);
+    // -- Parse config file paths from command line arguments --
+    ConfigPaths configPaths;
+
+    auto baseConfigIt = std::find(args.begin(), args.end(), "--base-config");
+    if (baseConfigIt != args.end() && std::next(baseConfigIt) != args.end()) {
+        core::Logger::Info("Using base config file from command line argument: {}", *std::next(baseConfigIt));
+        configPaths.basePath = *std::next(baseConfigIt);
+        args.erase(baseConfigIt, std::next(baseConfigIt, 2));
     }
     else {
-        core::Logger::Info("No config file specified, using default:  {}", std::string(kDefaultConfigPath));
-        configPath = kDefaultConfigPath;
+        core::Logger::Info("No base config file specified, using default:  {}", std::string(kDefaultBaseConfigPath));
+        configPaths.basePath = kDefaultBaseConfigPath;
+    }
+    
+    auto textureConfigIt = std::find(args.begin(), args.end(), "--texture-config");
+    if (textureConfigIt != args.end() && std::next(textureConfigIt) != args.end()) {
+        core::Logger::Info("Using texture config file from command line argument: {}", *std::next(textureConfigIt));
+        configPaths.texturePath = *std::next(textureConfigIt);
+        args.erase(textureConfigIt, std::next(textureConfigIt, 2));
     }
 
-    core::Logger::Info("Loading config file: " + configPath);
-	std::expected<ToolConfig, core::ToolResult> configResult = ConfigLoader::LoadConfig(configPath);
-    if (!configResult.has_value())
+    auto audioConfigIt = std::find(args.begin(), args.end(), "--audio-config");
+    if (audioConfigIt != args.end() && std::next(audioConfigIt) != args.end()) {
+        core::Logger::Info("Using audio config file from command line argument: {}", *std::next(audioConfigIt));
+        configPaths.audioPath = *std::next(audioConfigIt);
+        args.erase(audioConfigIt, std::next(audioConfigIt, 2));
+    }
+
+    // - - Load configs --
+    ToolConfig toolConfig;
+
+    core::Logger::Info("Loading base config file: " + configPaths.basePath);
+	std::expected<BaseConfig, core::ToolResult> baseConfigResult = ConfigLoader::LoadBaseConfig(configPaths.basePath);
+    if (!baseConfigResult.has_value())
     {
-        LogDiagnostics(configResult.error().diagnostics);
-        core::Logger::Error("Failed to load config file: " + configPath);
+        LogDiagnostics(baseConfigResult.error().diagnostics);
+        core::Logger::Error("Failed to load  base config file: " + configPaths.basePath);
         core::Logger::Shutdown();
-        return static_cast<int>(configResult.error().exitCode);
+        return static_cast<int>(baseConfigResult.error().exitCode);
 	}
-
-	const ToolConfig& toolConfig = *configResult;
-    core::Logger::Info("Base config loaded: " + toolConfig.baseConfig.metadata .name);
+    toolConfig.baseConfig = baseConfigResult.value();
+    core::Logger::Info("Base config loaded: " + baseConfigResult.value().metadata.name);
     
+    if (!configPaths.texturePath.empty()) {
+        core::Logger::Info("Loading texture config file: " + configPaths.texturePath);
+        std::expected<TextureConfig, core::ToolResult> textureConfigResult = ConfigLoader::LoadTextureConfig(configPaths.texturePath);
+        if (!textureConfigResult.has_value())
+        {
+            LogDiagnostics(textureConfigResult.error().diagnostics);
+            core::Logger::Error("Failed to load texture config file: " + configPaths.texturePath);
+            core::Logger::Shutdown();
+            return static_cast<int>(textureConfigResult.error().exitCode);
+        }
+        toolConfig.textureConfig = textureConfigResult.value();
+        core::Logger::Info("Texture config loaded: " + toolConfig.textureConfig.metadata.name);
+    }
+    else {
+        core::Logger::Info("No texture config provided. Skipping it.");
+    }
+    
+    if (!configPaths.texturePath.empty()) {
+        core::Logger::Info("Loading audio config file: " + configPaths.audioPath);
+        std::expected<AudioConfig, core::ToolResult> audioConfigResult = ConfigLoader::LoadAudioConfig(configPaths.audioPath);
+        if (!audioConfigResult.has_value())
+        {
+            LogDiagnostics(audioConfigResult.error().diagnostics);
+            core::Logger::Error("Failed to load audio config file: " + configPaths.audioPath);
+            core::Logger::Shutdown();
+            return static_cast<int>(audioConfigResult.error().exitCode);
+        }
+        toolConfig.audioConfig = audioConfigResult.value();
+        core::Logger::Info("Audio config loaded: " + toolConfig.audioConfig.metadata.name);
+    }
+    else {
+        core::Logger::Info("No audio config provided. Skipping it.");
+    }
 
+    // -- Create the specified mode --
     std::unique_ptr<ToolMode> mode = ToolModeFactory::Create(args[0], toolConfig);
 
     if (mode == nullptr)
@@ -128,6 +190,7 @@ int main(int argc, char* argv[])
         return static_cast<int>(core::ExitCode::InvalidArguments);
     }
 
+    // -- Run the mode  --
     auto result = mode->Run(
         std::vector<std::string>(args.begin() + 1, args.end())
     );

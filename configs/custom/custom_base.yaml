@@ -1,0 +1,13 @@
+metadata:
+  name: "custom-base-config"
+  description: " Base configuration for asset tools"
+  version: 1.0
+
+validation:
+  failOnWarning: false
+
+paths:
+  assetsRoot: "assets"
+
+logging:
+  verbose: false

@@ -79,16 +79,44 @@ namespace YAML {
     };
 
     template<>
+    struct convert<TextureConfig::TextureValidationConfig> {
+        static bool decode(const Node& node, TextureConfig::TextureValidationConfig& validationConfig) {
+            if (!node["allowedFormats"] || !node["maxSizeKb"] || !node["mipmapsRequired"]) {
+                return false;
+            }
+
+            validationConfig.allowedFormats = node["allowedFormats"].as<std::vector<std::string>>();
+            validationConfig.maxSizeKb = node["maxSizeKb"].as<int>();
+            validationConfig.mipmapsRequired = node["mipmapsRequired"].as<bool>();
+
+            return true;
+        }
+    };
+
+    template<>
     struct convert<TextureConfig> {
         static bool decode(const Node& node, TextureConfig& config) {
-            if ( !node["metadata"] || !node["maxSizeKb"] || !node["allowedFormats"] || !node["mipmapsRequired"]) {
+            if ( !node["metadata"] || !node["validation"]) {
                 return false;
             }
 
             config.metadata = node["metadata"].as<ConfigMetadata>();
-            config.maxSizeKb = node["maxSizeKb"].as<int>();
-            config.allowedFormats = node["allowedFormats"].as<std::vector<std::string>>();
-            config.mipmapsRequired = node["mipmapsRequired"].as<bool>();
+            config.validation = node["validation"].as<TextureConfig::TextureValidationConfig>();
+
+            return true;
+        }
+    };
+
+    template<>
+    struct convert<AudioConfig::AudioValidationConfig> {
+        static bool decode(const Node& node, AudioConfig::AudioValidationConfig& validationConfig) {
+            if (!node["channels"] || !node["sampleRate"] || !node["maxDurationSeconds"]) {
+                return false;
+            }
+
+            validationConfig.channels = node["channels"].as<std::vector<std::string>>();
+            validationConfig.sampleRate = node["sampleRate"].as<int>();
+            validationConfig.maxDurationSeconds = node["maxDurationSeconds"].as<int>();
 
             return true;
         }
@@ -97,49 +125,75 @@ namespace YAML {
     template<>
     struct convert<AudioConfig> {
         static bool decode(const Node& node, AudioConfig& config) {
-            if (!node["metadata"] || !node["sampleRate"] || !node["channels"] || !node["maxDurationSeconds"]) {
+            if (!node["metadata"] || !node["validation"]) {
                 return false;
             }
 
             config.metadata = node["metadata"].as<ConfigMetadata>();
-            config.sampleRate = node["sampleRate"].as<int>();
-            config.channels = node["channels"].as<std::vector<std::string>>();
-            config.maxDurationSeconds = node["maxDurationSeconds"].as<int>();
+            config.validation = node["validation"].as<AudioConfig::AudioValidationConfig>();
 
             return true;
         }
     };
 }
 
-std::expected<ToolConfig, core::ToolResult> ConfigLoader::LoadConfig(std::string_view configFilePath)
+std::filesystem::path ConfigLoader::ResolveConfigPath(std::string_view configFilePath)
 {
-    core::ToolResult toolResult;
-    try {
-        YAML::Node configNode = YAML::LoadFile(configFilePath.data());
-        auto baseConfig = configNode.as<BaseConfig>();
-        auto toolConfig = ToolConfig{ .baseConfig = baseConfig };
-        return toolConfig;
+    std::filesystem::path path(configFilePath);
+    
+    if (path.is_absolute()) {
+        return path;
     }
-    catch (const YAML::BadFile&) {
-        toolResult.AddError("Config file not found: {}", configFilePath);
-        toolResult.exitCode = core::ExitCode::ConfigNotFound;
-        return std::unexpected(toolResult);
+    
+    return kConfigsFolder / path;
+}
 
+template<typename T>
+std::expected<T, core::ToolResult> LoadConfigFromFile(std::string_view configFilePath)
+{
+    std::filesystem::path resolvedPath = ConfigLoader::ResolveConfigPath(configFilePath);
+    try {
+        YAML::Node configNode = YAML::LoadFile(resolvedPath.string());
+        T config = configNode.as<T>();
+        return config;
+    }
+    catch (const YAML::BadFile& e) {
+        core::ToolResult toolResult;
+        toolResult.AddError("Failed to open config file '{}': {}", resolvedPath.string(), e.what());
+        toolResult.exitCode = core::ExitCode::FileNotFound;
+        return std::unexpected(toolResult);
     }
     catch (const YAML::ParserException& e) {
-        toolResult.AddError("Config parse error at line {}: {}", e.mark.line, e.msg);
+        core::ToolResult toolResult;
+        toolResult.AddError("YAML parsing error in file '{}': {}", resolvedPath.string(), e.what());
         toolResult.exitCode = core::ExitCode::ConfigParseError;
         return std::unexpected(toolResult);
-
     }
     catch (const YAML::Exception& e) {
-        toolResult.AddError("Config validation error: {}", e.what());
-        toolResult.exitCode = core::ExitCode::ConfigValidationError;
+        core::ToolResult toolResult;
+        toolResult.AddError("YAML error in file '{}': {}", resolvedPath.string(), e.what());
+        toolResult.exitCode = core::ExitCode::ConfigParseError;
         return std::unexpected(toolResult);
     }
     catch (...) {
+        core::ToolResult toolResult;
         toolResult.AddError("Config loader encountered an unknown error");
         toolResult.exitCode = core::ExitCode::ToolFailure;
         return std::unexpected(toolResult);
     }
+}
+
+std::expected<BaseConfig, core::ToolResult> ConfigLoader::LoadBaseConfig(std::string_view configFilePath)
+{
+    return LoadConfigFromFile<BaseConfig>(configFilePath);
+}
+
+std::expected<TextureConfig, core::ToolResult> ConfigLoader::LoadTextureConfig(std::string_view configFilePath)
+{
+    return LoadConfigFromFile<TextureConfig>(configFilePath);
+}
+
+std::expected<AudioConfig, core::ToolResult> ConfigLoader::LoadAudioConfig(std::string_view configFilePath)
+{
+    return LoadConfigFromFile<AudioConfig>(configFilePath);
 }

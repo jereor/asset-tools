@@ -29,19 +29,29 @@ struct BaseConfig {
 };
 
 struct TextureConfig {
+    struct TextureValidationConfig {
+        std::vector<std::string> allowedFormats;
+        int maxSizeKb;
+        bool mipmapsRequired;
+    };
+
     ConfigMetadata metadata;
-    int maxSizeKb;
-    std::vector<std::string> allowedFormats;
-    bool mipmapsRequired;
+    TextureValidationConfig validation;
 };
 
 struct AudioConfig {
+    struct AudioValidationConfig {
+        std::vector<std::string> channels;
+        int sampleRate;
+        int maxDurationSeconds;
+    };
+    
     ConfigMetadata metadata;
-    int sampleRate;
-    std::vector<std::string> channels;
-    int maxDurationSeconds;
+    AudioValidationConfig validation;
 };
 
 struct ToolConfig {
     BaseConfig baseConfig;
+    TextureConfig textureConfig;
+    AudioConfig audioConfig;
 };

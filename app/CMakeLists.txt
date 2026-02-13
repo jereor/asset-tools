@@ -7,6 +7,8 @@ add_executable(AssetTools
     src/config/ConfigLoader.cpp
 )
 
+target_compile_definitions(AssetTools PRIVATE PROJECT_ROOT="${CMAKE_SOURCE_DIR}")
+
 target_include_directories(AssetTools PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 # Enable strict warnings

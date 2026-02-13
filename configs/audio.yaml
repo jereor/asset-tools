@@ -3,7 +3,8 @@ metadata:
   description: "Configurations for audio asset validation"
   version: 1.0
 
-audio:
+validation:
+  channels:
+    - stereo
   sampleRate: 44100
-  channels: stereo
   maxDurationSeconds: 120
