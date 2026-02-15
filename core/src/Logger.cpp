@@ -75,7 +75,13 @@ namespace core
 
         std::time_t now = std::time(nullptr);
         char timeBuffer[26]; // Allocate memory buffer (ctime_s = 26 characters)
-        ctime_s(timeBuffer, sizeof(timeBuffer), &now);
+#ifdef _WIN32
+    // Windows: use ctime_s (secure version)
+    ctime_s(timeBuffer, sizeof(timeBuffer), &now);
+#else
+    // MacOS and Linux: use ctime_r (thread-safe version)
+    ctime_r(&now, timeBuffer);
+#endif
 
         timeBuffer[24] = '\0'; // Remove trailing newline added by ctime_s
 
