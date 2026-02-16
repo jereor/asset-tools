@@ -141,14 +141,18 @@ Behavior:
 - **Static library + executable architecture**
 - Designed to scale to multiple tools and shared codebases
 
+### Pre-Requirements:
+- CMake (3.16 or newer)
+- C++23 compiler (LLVM 18.0+ or MSVC 18.0+)
+
 ### Build Instructions (Windows)
 
-- CLI: use `build.bat` in Visual Studio or Visual Studio Code
+- CLI: use `build.bat`
 - File Explorer: use `build_interactive.bat`
 
-### Build Instructions (Mac or Linux)
-Navigate to the 'asset-tools' folder and run the following commands:
-- cmake -S . -B build
+### Build Instructions (MacOS)
+Navigate to the 'asset-tools' folder and run the following commands (use your compiler path):
+- cmake -S . -B build -DCMAKE_CXX_COMPILER=/usr/local/opt/llvm-18/bin/clang++
 - cmake --build build --config Release --parallel
 
 ---
