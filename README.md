@@ -1,16 +1,13 @@
 # AssetTools — Internal Game Development Tools Prototype
 
 AssetTools is a C++ prototype of an **internal game development tool**
-designed to support **content creation workflows, asset pipelines, and
-shared engine technology**.
+designed to support **content creation workflows and asset pipelines**.
 
-The project is intentionally scoped as a **tools-side application**, not
-a game runtime. Its focus is on:
-
-- Developer productivity
-- Robust, pipeline-friendly workflows
-- Clear ownership between engine-style libraries and tools
-- Maintainable, extensible C++ infrastructure
+The project focuses on pre-engine asset validation similar to what game companies 
+like Supercell would use. 
+The idea is that assets are validated close to asset creation to catch problems 
+before the assets are imported to the game engine. 
+First by artists and designers, and later re-validated by build pipelines.
 
 This mirrors the type of internal tools used by game studios to support
 artists, designers, and engineers across multiple projects.
@@ -21,7 +18,7 @@ artists, designers, and engineers across multiple projects.
 
 The primary goals of AssetTools are to:
 
-- Provide a **shared core library** used by multiple tools
+- Provide a **shared core library** used by multiple asset tools
 - Demonstrate a **target-based CMake project structure**
 - Implement **production-style logging** suitable for automated pipelines
 - Validate asset data using **rule-based, data-driven systems**
@@ -30,6 +27,39 @@ The primary goals of AssetTools are to:
 
 This project is learning-focused, but intentionally designed to be
 **industry-realistic** and representative of professional tools code.
+
+---
+
+## 🛠 Tool Usage
+
+### Validate Asset Data
+
+AssetTools validate <asset_file>
+
+Behavior:
+- Parses asset definitions from the input file
+- Applies rule-based validation
+- Logs rule violations
+
+### Inspect Assets
+
+AssetTools inspect <asset_file>
+
+Behavior:
+- Retrieves asset metadata from the input file
+- Logs asset metadata, including file extension, file size, and last-modified timestamp
+
+---
+
+## 🚧 Project Status
+
+This project is under active development as a learning-focused tools
+prototype. Future work includes:
+
+- Configurable validation rules
+- Directory-based asset discovery
+- Platform-specific constraints
+- Improved CLI ergonomics and diagnostics
 
 ---
 
@@ -78,7 +108,7 @@ Navigate to app/Release or app/Debug to find the executable.
 ### `configs`
 
 Contains **YAML configuration files** to configure tool behavior and validation rules.
-Passed into the tool as CLI arguments. (eg. --config path/to/config)
+Passed into the tool as CLI arguments.
 
 Config layers (in order of precedence)
 1. Built-in defaults (code)
@@ -109,28 +139,6 @@ This mirrors how studios structure shared tooling and engine-side code.
 
 Used by CMake to define the project's source files, build targets, and configuration options. 
 It contains rules for the build process, allowing CMake to generate the necessary files for building the executable.
-
----
-
-
-## 🛠 Tool Usage
-
-### Validate Asset Data
-
-AssetTools validate <asset_file>
-
-Behavior:
-- Parses asset definitions from the input file
-- Applies rule-based validation
-- Logs rule violations
-
-### Inspect Assets
-
-AssetTools inspect <asset_file>
-
-Behavior:
-- Retrieves asset metadata from the input file
-- Logs asset metadata, including file extension, file size, and last-modified timestamp
 
 ---
 
@@ -189,15 +197,3 @@ Diagnostics
    ↓
 
 App decides exit code & output
-
----
-
-## 🚧 Status
-
-This project is under active development as a learning-focused tools
-prototype. Future work includes:
-
-- Configurable validation rules
-- Directory-based asset discovery
-- Platform-specific constraints
-- Improved CLI ergonomics and diagnostics
