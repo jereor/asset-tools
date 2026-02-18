@@ -96,7 +96,7 @@ core::ToolResult ValidateMode::Run(const std::vector<std::string>& args)
 
     if (hasErrors)
     {
-		toolResult.exitCode = core::ExitCode::ToolFailure;
+		toolResult.exitCode = core::ExitCode::ValidationFailed;
         return toolResult;
     }
 
