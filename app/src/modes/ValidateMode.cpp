@@ -52,7 +52,9 @@ core::ToolResult ValidateMode::Run(const std::vector<std::string>& args)
         return toolResult;
     }
 
-    std::string fileExt = GetFileExtension(args[0]);
+    std::string filePath = args[0];
+
+    std::string fileExt = GetFileExtension(filePath);
     if (fileExt != ".txt")
     {
         toolResult.AddError("Unsupported file extension: {}", fileExt);
@@ -61,11 +63,11 @@ core::ToolResult ValidateMode::Run(const std::vector<std::string>& args)
         return toolResult;
     }
     
-    std::ifstream file(args[0]);
+    std::ifstream file(filePath);
     if (!file)
     {
-        toolResult.AddError("Failed to open asset file: {}", args[0]);
-        toolResult.exitCode = core::ExitCode::ToolFailure;
+        toolResult.AddError("Failed to find asset file: {}", filePath);
+        toolResult.exitCode = core::ExitCode::FileNotFound;
         return toolResult;
     }
 
