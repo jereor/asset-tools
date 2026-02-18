@@ -20,8 +20,6 @@ namespace
 {
     const std::string kDefaultLogFilePath = "AssetTools.log";
     const std::string kDefaultBaseConfigPath = "base.yaml";
-    const std::string kDefaultTextureConfigPath = "textures.yaml";
-    const std::string kDefaultAudioConfigPath = "audio.yaml";
 
     void PrintHelp()
     {
@@ -70,6 +68,7 @@ int main(int argc, char* argv[])
     std::vector<std::string> args(argv + 1, argv + argc);
 
     core::Logger::Init(kDefaultLogFilePath);
+    core::Logger::Info("Log file opened: {}", kDefaultLogFilePath);
 
     if (args.empty())
     {
@@ -124,47 +123,47 @@ int main(int argc, char* argv[])
     // - - Load configs --
     ToolConfig toolConfig;
 
-    core::Logger::Info("Loading base config file: " + configPaths.basePath);
+    core::Logger::Info("Loading base config file: {}", configPaths.basePath);
 	std::expected<BaseConfig, core::ToolResult> baseConfigResult = ConfigLoader::LoadBaseConfig(configPaths.basePath);
     if (!baseConfigResult.has_value())
     {
         LogDiagnostics(baseConfigResult.error().diagnostics);
-        core::Logger::Error("Failed to load  base config file: " + configPaths.basePath);
+        core::Logger::Error("Failed to load  base config file: {}", configPaths.basePath);
         core::Logger::Shutdown();
         return static_cast<int>(baseConfigResult.error().exitCode);
 	}
     toolConfig.baseConfig = baseConfigResult.value();
-    core::Logger::Info("Base config loaded: " + baseConfigResult.value().metadata.name);
+    core::Logger::Info("Base config loaded: {} v{}",  toolConfig.baseConfig.metadata.name, toolConfig.baseConfig.metadata.version);
     
     if (!configPaths.texturePath.empty()) {
-        core::Logger::Info("Loading texture config file: " + configPaths.texturePath);
+        core::Logger::Info("Loading texture config file: {}", configPaths.texturePath);
         std::expected<TextureConfig, core::ToolResult> textureConfigResult = ConfigLoader::LoadTextureConfig(configPaths.texturePath);
         if (!textureConfigResult.has_value())
         {
             LogDiagnostics(textureConfigResult.error().diagnostics);
-            core::Logger::Error("Failed to load texture config file: " + configPaths.texturePath);
+            core::Logger::Error("Failed to load texture config file: {}", configPaths.texturePath);
             core::Logger::Shutdown();
             return static_cast<int>(textureConfigResult.error().exitCode);
         }
         toolConfig.textureConfig = textureConfigResult.value();
-        core::Logger::Info("Texture config loaded: " + toolConfig.textureConfig.metadata.name);
+        core::Logger::Info("Texture config loaded: {} v{}",  toolConfig.textureConfig.metadata.name, toolConfig.textureConfig.metadata.version);
     }
     else {
         core::Logger::Info("No texture config provided. Skipping it.");
     }
     
     if (!configPaths.texturePath.empty()) {
-        core::Logger::Info("Loading audio config file: " + configPaths.audioPath);
+        core::Logger::Info("Loading audio config file: {}", configPaths.audioPath);
         std::expected<AudioConfig, core::ToolResult> audioConfigResult = ConfigLoader::LoadAudioConfig(configPaths.audioPath);
         if (!audioConfigResult.has_value())
         {
             LogDiagnostics(audioConfigResult.error().diagnostics);
-            core::Logger::Error("Failed to load audio config file: " + configPaths.audioPath);
+            core::Logger::Error("Failed to load audio config file: {}", configPaths.audioPath);
             core::Logger::Shutdown();
             return static_cast<int>(audioConfigResult.error().exitCode);
         }
         toolConfig.audioConfig = audioConfigResult.value();
-        core::Logger::Info("Audio config loaded: " + toolConfig.audioConfig.metadata.name);
+        core::Logger::Info("Audio config loaded: {} v{}",  toolConfig.audioConfig.metadata.name, toolConfig.audioConfig.metadata.version);
     }
     else {
         core::Logger::Info("No audio config provided. Skipping it.");
@@ -175,14 +174,14 @@ int main(int argc, char* argv[])
 
     if (mode == nullptr)
     {
-        core::Logger::Error("Unknown mode: " + args[0]);
+        core::Logger::Error("Unknown mode: {}", args[0]);
         
         auto availableModes = ToolModeFactory::GetAvailableModes();
         if (!availableModes.empty())
         {
             core::Logger::Info("Available modes:");
             for (const auto& modeName : availableModes)
-                core::Logger::Info("  - " + modeName);
+                core::Logger::Info("  - {}", modeName);
         }
         
         PrintHelp();
@@ -196,6 +195,18 @@ int main(int argc, char* argv[])
     );
 
     LogDiagnostics(result.diagnostics);
+
+    if (result.IsUserError())
+    {
+        core::Logger::Error("USER ERROR: Please review the errors and try again.");
+    }
+    else if (result.IsToolError()) {
+        core::Logger::Error("TOOL ERROR: Please report the bug to the tool developer and provide the logs.");
+    }
+    else {
+        core::Logger::Info("Task completed successfully with no errors.");
+    }
+
     core::Logger::Shutdown();
     return static_cast<int>(result.exitCode);
 }
