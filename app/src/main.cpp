@@ -196,15 +196,19 @@ int main(int argc, char* argv[])
 
     LogDiagnostics(result.diagnostics);
 
-    if (result.IsUserError())
+    if (result.exitCode == core::ExitCode::ValidationFailed)
+    {
+        core::Logger::Error("VALIDATION FAILURE: Please fix the validation errors and try again.");
+    }
+    else if (result.IsUserError())
     {
         core::Logger::Error("USER ERROR: Please review the errors and try again.");
     }
     else if (result.IsToolError()) {
         core::Logger::Error("TOOL ERROR: Please report the bug to the tool developer and provide the logs.");
     }
-    else {
-        core::Logger::Info("Task completed successfully with no errors.");
+    else if (result.IsSuccess()) {
+        core::Logger::Info("SUCCESS: Task completed successfully with no errors.");
     }
 
     core::Logger::Shutdown();
