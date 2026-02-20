@@ -29,6 +29,20 @@ std::unique_ptr<ToolMode> ValidateMode::Create(const ToolConfig& config)
 
 namespace
 {
+    static inline const std::filesystem::path kProjectRoot = PROJECT_ROOT;
+
+    std::filesystem::path ResolveAssetPath(std::string_view assetFilePath, ToolConfig config)
+    {
+        std::filesystem::path path(assetFilePath);
+        
+        if (path.is_absolute()) {
+            return path;
+        }
+
+        std::filesystem::path assetsRoot = kProjectRoot / config.baseConfig.paths.assetsRoot;
+        return assetsRoot / path;
+    }
+
     std::string GetFileExtension(const std::filesystem::path& filePath)
     {
         std::string ext = filePath.extension().string();
@@ -52,7 +66,7 @@ core::ToolResult ValidateMode::Run(const std::vector<std::string>& args)
         return toolResult;
     }
 
-    std::string filePath = args[0];
+    std::filesystem::path filePath = ResolveAssetPath(args[0], m_config);
 
     std::string fileExt = GetFileExtension(filePath);
     if (fileExt != ".txt")
@@ -66,7 +80,7 @@ core::ToolResult ValidateMode::Run(const std::vector<std::string>& args)
     std::ifstream file(filePath);
     if (!file)
     {
-        toolResult.AddError("Failed to find asset file: {}", filePath);
+        toolResult.AddError("Failed to find asset file: {}", filePath.string());
         toolResult.exitCode = core::ExitCode::FileNotFound;
         return toolResult;
     }

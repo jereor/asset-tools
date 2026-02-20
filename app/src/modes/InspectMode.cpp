@@ -11,6 +11,35 @@
 
 namespace
 {
+    bool g_validateRegistered = ToolModeFactory::Register(InspectMode::GetFactoryName(), InspectMode::Create);
+}
+
+ std::string InspectMode::GetFactoryName()
+ {
+     return "inspect";
+ }
+
+  std::unique_ptr<ToolMode> InspectMode::Create(const ToolConfig& config)
+ {
+    return std::make_unique<InspectMode>(config);
+ }
+
+namespace
+{
+    static inline const std::filesystem::path kProjectRoot = PROJECT_ROOT;
+
+    std::filesystem::path ResolveAssetPath(std::string_view assetFilePath, ToolConfig config)
+    {
+        std::filesystem::path path(assetFilePath);
+        
+        if (path.is_absolute()) {
+            return path;
+        }
+
+        std::filesystem::path assetsRoot = kProjectRoot / config.baseConfig.paths.assetsRoot;
+        return assetsRoot / path;
+    }
+
     std::string GetFileExtension(const std::filesystem::path& filePath)
     {
         std::string ext = filePath.extension().string();
@@ -99,21 +128,6 @@ namespace
     }
 }
 
-namespace
-{
-    bool g_validateRegistered = ToolModeFactory::Register(InspectMode::GetFactoryName(), InspectMode::Create);
-}
-
- std::string InspectMode::GetFactoryName()
- {
-     return "inspect";
- }
-
-  std::unique_ptr<ToolMode> InspectMode::Create(const ToolConfig& config)
- {
-    return std::make_unique<InspectMode>(config);
- }
-
 core::ToolResult InspectMode::Run(const std::vector<std::string>& args)
 {
     core::ToolResult toolResult;
@@ -125,7 +139,7 @@ core::ToolResult InspectMode::Run(const std::vector<std::string>& args)
 		return toolResult;
     }
 
-    std::filesystem::path assetPath{args[0]};
+    std::filesystem::path assetPath = ResolveAssetPath(args[0], m_config);
     if (!std::filesystem::exists(assetPath))
     {
         toolResult.AddError("Asset not found: {}", assetPath.string());
