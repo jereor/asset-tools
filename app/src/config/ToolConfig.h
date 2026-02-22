@@ -2,6 +2,7 @@
 
 #include <string>
 #include <vector>
+#include <optional>
 
 struct ConfigMetadata {
     std::string name;
@@ -52,6 +53,6 @@ struct AudioConfig {
 
 struct ToolConfig {
     BaseConfig baseConfig;
-    TextureConfig textureConfig;
-    AudioConfig audioConfig;
+    std::optional<TextureConfig> textureConfig;
+    std::optional<AudioConfig> audioConfig;
 };

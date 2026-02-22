@@ -1,5 +1,7 @@
 #include "core/TextureSizeRule.h"
 
+#include <format>
+
 namespace core
 {
     ValidationResult TextureSizeRule::Validate(const Asset& asset) const
@@ -9,12 +11,10 @@ namespace core
             return { true, "" };
         }
 
-        if (asset.sizeKB > 1024)
+        if (asset.sizeKB > m_maxSizeKb)
         {
-            return {
-                false,
-                "Texture '" + asset.name + "' exceeds size limit (1024 KB)"
-            };
+            std::string errorMessage = std::format("Texture '{}' exceeds size limit ({} KB)", asset.name, m_maxSizeKb);
+            return { false, errorMessage };
         }
 
         return { true, "" };

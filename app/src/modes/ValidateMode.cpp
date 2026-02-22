@@ -85,9 +85,26 @@ core::ToolResult ValidateMode::Run(const std::vector<std::string>& args)
         return toolResult;
     }
 
+    if (!m_config.textureConfig || !m_config.audioConfig) // TODO: Check if validating textures and audio separately
+    {
+        if (!m_config.textureConfig) // TODO: Check if validating textures
+        {
+            toolResult.AddError("No texture config provided. Please provide it to validate texture assets. Use --help to see how.");
+        }
+
+        if (!m_config.audioConfig) // TODO: Check if validating audio
+        {
+            toolResult.AddError("No audio config provided. Please provide it to validate audio assets. Use --help to see how.");
+        }
+        toolResult.exitCode = core::ExitCode::InvalidArguments;
+        return toolResult;
+    }
+    TextureConfig::TextureValidationConfig textureValidationConfig = m_config.textureConfig.value().validation;
+    AudioConfig::AudioValidationConfig audioValidationConfig = m_config.audioConfig.value().validation;
+
     core::AssetParser parser;
     core::AssetValidator validator;
-    validator.AddRule(std::make_unique<core::TextureSizeRule>());
+    validator.AddRule(std::make_unique<core::TextureSizeRule>(textureValidationConfig.maxSizeKb));
 
     std::string line;
     bool hasErrors = false;

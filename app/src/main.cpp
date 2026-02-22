@@ -146,7 +146,7 @@ int main(int argc, char* argv[])
             return static_cast<int>(textureConfigResult.error().exitCode);
         }
         toolConfig.textureConfig = textureConfigResult.value();
-        core::Logger::Info("Texture config loaded: {} v{}",  toolConfig.textureConfig.metadata.name, toolConfig.textureConfig.metadata.version);
+        core::Logger::Info("Texture config loaded: {} v{}",  toolConfig.textureConfig.value().metadata.name, toolConfig.textureConfig.value().metadata.version);
     }
     else {
         core::Logger::Info("No texture config provided. Skipping it.");
@@ -163,7 +163,7 @@ int main(int argc, char* argv[])
             return static_cast<int>(audioConfigResult.error().exitCode);
         }
         toolConfig.audioConfig = audioConfigResult.value();
-        core::Logger::Info("Audio config loaded: {} v{}",  toolConfig.audioConfig.metadata.name, toolConfig.audioConfig.metadata.version);
+        core::Logger::Info("Audio config loaded: {} v{}",  toolConfig.audioConfig.value().metadata.name, toolConfig.audioConfig.value().metadata.version);
     }
     else {
         core::Logger::Info("No audio config provided. Skipping it.");
