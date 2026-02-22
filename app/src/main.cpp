@@ -152,7 +152,7 @@ int main(int argc, char* argv[])
         core::Logger::Info("No texture config provided. Skipping it.");
     }
     
-    if (!configPaths.texturePath.empty()) {
+    if (!configPaths.audioPath.empty()) {
         core::Logger::Info("Loading audio config file: {}", configPaths.audioPath);
         std::expected<AudioConfig, core::ToolResult> audioConfigResult = ConfigLoader::LoadAudioConfig(configPaths.audioPath);
         if (!audioConfigResult.has_value())
