@@ -10,10 +10,10 @@ namespace core
     class AssetValidator
     {
     public:
-        void AddRule(std::unique_ptr<ValidationRule> rule);
+        void AddRule(std::unique_ptr<ValidationRule<Asset>> rule);
         std::vector<ValidationResult> Validate(const Asset& asset) const;
 
     private:
-        std::vector<std::unique_ptr<ValidationRule>> m_rules;
+        std::vector<std::unique_ptr<ValidationRule<Asset>>> m_rules;
     };
 }

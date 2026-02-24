@@ -2,7 +2,7 @@
 
 namespace core
 {
-    void AssetValidator::AddRule(std::unique_ptr<ValidationRule> rule)
+    void AssetValidator::AddRule(std::unique_ptr<ValidationRule<Asset>> rule)
     {
         m_rules.push_back(std::move(rule));
     }
@@ -13,7 +13,7 @@ namespace core
 
         for (const auto& rule : m_rules)
         {
-            auto result = rule->Validate(asset);
+            ValidationResult result = rule->Validate(asset);
             if (!result.success)
             {
                 results.push_back(result);
