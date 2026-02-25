@@ -3,6 +3,7 @@
 #include "core/ExitCode.h"
 
 #include "config/ConfigLoader.h"
+#include "config/ConfigValidator.h"
 #include "modes/ToolModeFactory.h"
 #include "modes/ScanMode.h"
 #include "modes/ValidateMode.h"
@@ -167,6 +168,32 @@ int main(int argc, char* argv[])
     }
     else {
         core::Logger::Info("No audio config provided. Skipping it.");
+    }
+
+    // -- Validate config values --
+    core::Logger::Info("Validating config values...");
+    ConfigValidator validator;
+
+    validator
+        .AddRule([](const TextureConfig& c) -> std::optional<std::string> {
+            if (c.metadata.version <= 0)
+                return "version number is invalid [0 or negative]: " + std::to_string(c.metadata.version);
+            return std::nullopt;
+        })
+        .AddRule([](const TextureConfig& c) -> std::optional<std::string> {
+            if (c.validation.maxSizeKb < 64 || c.validation.maxSizeKb > 4096)
+                return "maxSizeKb out of range [64 - 4096]: " + std::to_string(c.validation.maxSizeKb);
+            return std::nullopt;
+        });
+
+    TextureConfig textureConfig = toolConfig.textureConfig.value();
+    std::vector<std::string> errors = validator.Validate(textureConfig);
+    if (!errors.empty()) {
+        for (const auto& error : errors) {
+            core::Logger::Error(error);
+        }
+        core::Logger::Shutdown();
+        return static_cast<int>(core::ExitCode::ConfigValidationError);
     }
 
     // -- Create the specified mode --

@@ -5,6 +5,7 @@ add_executable(AssetTools
     src/modes/ToolModeFactory.cpp
     src/modes/ValidateMode.cpp
     src/config/ConfigLoader.cpp
+    src/config/ConfigValidator.cpp
 )
 
 target_compile_definitions(AssetTools PRIVATE PROJECT_ROOT="${CMAKE_SOURCE_DIR}")
