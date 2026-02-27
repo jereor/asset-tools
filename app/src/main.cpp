@@ -173,8 +173,11 @@ int main(int argc, char* argv[])
     // -- Validate config values --
     core::Logger::Info("Validating config values...");
     ConfigValidator validator;
+    std::vector<std::string> validatorErrors;
 
-    validator
+    if (toolConfig.textureConfig.has_value())
+    {
+        validator
         .AddRule([](const TextureConfig& c) -> std::optional<std::string> {
             if (c.metadata.version <= 0)
                 return "version number is invalid [0 or negative]: " + std::to_string(c.metadata.version);
@@ -186,10 +189,12 @@ int main(int argc, char* argv[])
             return std::nullopt;
         });
 
-    TextureConfig textureConfig = toolConfig.textureConfig.value();
-    std::vector<std::string> errors = validator.Validate(textureConfig);
-    if (!errors.empty()) {
-        for (const auto& error : errors) {
+        TextureConfig textureConfig = toolConfig.textureConfig.value();
+        validatorErrors = validator.Validate(textureConfig);
+    }
+
+    if (!validatorErrors.empty()) {
+        for (const auto& error : validatorErrors) {
             core::Logger::Error(error);
         }
         core::Logger::Shutdown();
@@ -203,7 +208,7 @@ int main(int argc, char* argv[])
     {
         core::Logger::Error("Unknown mode: {}", args[0]);
         
-        auto availableModes = ToolModeFactory::GetAvailableModes();
+        std::vector<std::string> availableModes = ToolModeFactory::GetAvailableModes();
         if (!availableModes.empty())
         {
             core::Logger::Info("Available modes:");
