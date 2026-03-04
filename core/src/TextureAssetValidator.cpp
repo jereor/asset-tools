@@ -1,13 +1,13 @@
-#include "core/AssetValidator.h"
+#include "core/TextureAssetValidator.h"
 
 namespace core
 {
-    void AssetValidator::AddRule(std::unique_ptr<ValidationRule<Asset>> rule)
+    void TextureAssetValidator::AddRule(std::unique_ptr<ValidationRule<TextureAsset>> rule)
     {
         m_rules.push_back(std::move(rule));
     }
 
-    std::vector<ValidationResult> AssetValidator::Validate(const Asset& asset) const
+    std::vector<ValidationResult> TextureAssetValidator::Validate(const TextureAsset& asset) const
     {
         std::vector<ValidationResult> results;
 

@@ -1,9 +1,10 @@
 #include "ValidateMode.h"
 
 #include "ToolModeFactory.h"
-#include "core/Logger.h"
+#include "core/TextureAsset.h"
+#include "core/AudioAsset.h"
 #include "core/AssetParser.h"
-#include "core/AssetValidator.h"
+#include "core/TextureAssetValidator.h"
 #include "core/TextureSizeRule.h"
 
 #include <fstream>
@@ -53,6 +54,33 @@ namespace
 
         return ext;
     }
+
+    // TODO: Get supported extensions from configs
+    static constexpr std::string_view supportedExtensions[] = {
+        ".png", ".jpg", ".wav"
+    };
+
+    bool IsSupportedExtension(std::string_view ext)
+    {
+        return std::find(std::begin(supportedExtensions),  std::end(supportedExtensions), ext) 
+                != std::end(supportedExtensions);
+    }
+
+    std::string SupportedExtensionsToString()
+    {
+        std::ostringstream out;
+        bool first = true;
+
+        for (std::string_view ext : supportedExtensions)
+        {
+            if (!first)
+                out << ", ";
+            out << ext;
+            first = false;
+        }
+
+        return out.str();
+    }
 }
 
 core::ToolResult ValidateMode::Run(const std::vector<std::string>& args)
@@ -66,68 +94,103 @@ core::ToolResult ValidateMode::Run(const std::vector<std::string>& args)
         return toolResult;
     }
 
-    std::filesystem::path filePath = ResolveAssetPath(args[0], m_config);
-
-    std::string fileExt = GetFileExtension(filePath);
-    if (fileExt != ".txt")
+    std::filesystem::path assetPath = ResolveAssetPath(args[0], m_config);
+    if (!std::filesystem::exists(assetPath))
     {
-        toolResult.AddError("Unsupported file extension: {}", fileExt);
-        toolResult.AddInfo("Only .txt files are supported for validation in this mode.");
-        toolResult.exitCode = core::ExitCode::UnsupportedFormat;
-        return toolResult;
-    }
-    
-    std::ifstream file(filePath);
-    if (!file)
-    {
-        toolResult.AddError("Failed to find asset file: {}", filePath.string());
+        toolResult.AddError("Asset not found: {}", assetPath.string());
         toolResult.exitCode = core::ExitCode::FileNotFound;
         return toolResult;
     }
 
-    if (!m_config.textureConfig || !m_config.audioConfig) // TODO: Check if validating textures and audio separately
+    if (!std::filesystem::is_regular_file(assetPath))
     {
-        if (!m_config.textureConfig) // TODO: Check if validating textures
-        {
-            toolResult.AddError("No texture config provided. Please provide it to validate texture assets. Use --help to see how.");
-        }
-
-        if (!m_config.audioConfig) // TODO: Check if validating audio
-        {
-            toolResult.AddError("No audio config provided. Please provide it to validate audio assets. Use --help to see how.");
-        }
+        toolResult.AddError("The specified path is not a regular file: {}", assetPath.string());
         toolResult.exitCode = core::ExitCode::InvalidArguments;
         return toolResult;
     }
-    TextureConfig::TextureValidationConfig textureValidationConfig = m_config.textureConfig.value().validation;
-    AudioConfig::AudioValidationConfig audioValidationConfig = m_config.audioConfig.value().validation;
 
-    core::AssetParser parser;
-    core::AssetValidator validator;
-    validator.AddRule(std::make_unique<core::TextureSizeRule>(textureValidationConfig.maxSizeKb));
-
-    std::string line;
-    bool hasErrors = false;
-
-    while (std::getline(file, line))
+    std::string fileExt = GetFileExtension(assetPath);
+    if (!IsSupportedExtension(fileExt))
     {
-        core::ParseResult parseResult = parser.ParseLine(line);
-        if (!parseResult.asset)
+        toolResult.AddError("Unsupported file extension: {}", fileExt);
+        toolResult.AddInfo("Supported extensions: " + SupportedExtensionsToString());
+        toolResult.exitCode = core::ExitCode::UnsupportedFormat;
+        return toolResult;
+    }
+    
+    std::ifstream file(assetPath);
+    if (!file)
+    {
+        toolResult.AddError("Failed to find asset file: {}", assetPath.string());
+        toolResult.exitCode = core::ExitCode::FileNotFound;
+        return toolResult;
+    }
+
+    // -- Parse asset file into struct --
+    core::AssetParser assetParser;
+    std::variant<std::monostate, core::TextureAsset, core::AudioAsset> asset = assetParser.ParseAsset(assetPath);
+
+    // -- Get the asset type --
+    core::AssetType assetType = core::AssetType::Unknown;
+    if (auto textureAssetPtr = std::get_if<core::TextureAsset>(&asset))
+    {
+        assetType = core::AssetType::Texture;
+        toolResult.AddInfo("Parsed a texture asset: {}", textureAssetPtr->file.name);
+    }
+    else if (auto audioAssetPtr = std::get_if<core::AudioAsset>(&asset))
+    {
+        assetType = core::AssetType::Audio;
+        toolResult.AddInfo("Parsed an audio asset: {}", audioAssetPtr->file.name);
+    }
+
+    // -- Get validation configs --
+    TextureConfig::TextureValidationConfig textureValidationConfig;
+    AudioConfig::AudioValidationConfig audioValidationConfig;
+    if (assetType == core::AssetType::Texture)
+    {
+        if (!m_config.textureConfig)
         {
-            toolResult.AddError(parseResult.error);
-            hasErrors = true;
-            continue;
+            toolResult.AddError("No texture config provided. Please provide it to validate texture assets. Use --help to see how.");
+            toolResult.exitCode = core::ExitCode::InvalidArguments;
+            return toolResult;
         }
 
-        std::vector<core::ValidationResult> results = validator.Validate(*parseResult.asset);
-        for (const core::ValidationResult& result : results)
+        textureValidationConfig = m_config.textureConfig.value().validation;
+    }
+    else if (assetType == core::AssetType::Audio)
+    {
+        if (!m_config.audioConfig)
+        {
+            toolResult.AddError("No audio config provided. Please provide it to validate audio assets. Use --help to see how.");
+            toolResult.exitCode = core::ExitCode::InvalidArguments;
+            return toolResult;
+        }
+
+        audioValidationConfig = m_config.audioConfig.value().validation;
+    }
+
+    // -- Validate assets --
+    std::vector<core::ValidationResult> results;
+    if (assetType == core::AssetType::Texture)
+    {
+        core::TextureAssetValidator validator;
+        validator.AddRule(std::make_unique<core::TextureSizeRule>(textureValidationConfig.maxSizeKb));
+        results = validator.Validate(std::get<core::TextureAsset>(asset));
+    }
+
+    // TODO: Validate audio assets with new AssetValidator 
+
+    bool validationFailed = false;
+    for (const core::ValidationResult& result : results)
+    {
+        if (!result.success)
         {
             toolResult.AddError(result.message);
-            hasErrors = true;
+            validationFailed = true;
         }
     }
 
-    if (hasErrors)
+    if (validationFailed)
     {
 		toolResult.exitCode = core::ExitCode::ValidationFailed;
         return toolResult;

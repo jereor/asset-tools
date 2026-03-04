@@ -1,7 +1,7 @@
 add_library(core STATIC
     src/AssetParser.cpp
-    src/AssetValidator.cpp
     src/Logger.cpp
+    src/TextureAssetValidator.cpp
     src/TextureSizeRule.cpp
     src/Version.cpp
 )

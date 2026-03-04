@@ -11,10 +11,25 @@ namespace core
         Unknown
     };
 
-    struct Asset
+    struct File
     {
-        std::string name;
-        AssetType type;
-        int sizeKB;
+        std::string name{};
+        std::string extension{};
+        int sizeKB{};
+    };
+
+    struct TextureAsset
+    {
+        File file{};
+        int width{};
+        int height{};
+    };
+
+    struct AudioAsset
+    {
+        File file{};
+        int duration{};
+        int sampleRate{};
+        int channelCount{};
     };
 }

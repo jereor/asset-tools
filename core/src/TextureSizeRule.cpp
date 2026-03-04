@@ -4,16 +4,11 @@
 
 namespace core
 {
-    ValidationResult TextureSizeRule::Validate(const Asset& asset) const
+    ValidationResult TextureSizeRule::Validate(const TextureAsset& asset) const
     {
-        if (asset.type != AssetType::Texture)
+        if (asset.file.sizeKB > m_maxSizeKb)
         {
-            return { true, "" };
-        }
-
-        if (asset.sizeKB > m_maxSizeKb)
-        {
-            std::string errorMessage = std::format("Texture '{}' exceeds size limit ({} KB)", asset.name, m_maxSizeKb);
+            std::string errorMessage = std::format("Texture '{}' exceeds size limit ({} KB)", asset.file.name, m_maxSizeKb);
             return { false, errorMessage };
         }
 

@@ -1,36 +1,62 @@
 #include "core/AssetParser.h"
 
-#include <sstream>
+namespace
+{
+    std::string GetFileExtension(const std::filesystem::path& filePath)
+    {
+        std::string ext = filePath.extension().string();
+
+        // Convert extension to lowercase (for case-insensitive match)
+        std::transform(ext.begin(), ext.end(), ext.begin(),
+            [](unsigned char c) { return std::tolower(c); });
+
+        return ext;
+    }
+
+    static constexpr std::string_view textureExtensions[] = {
+        ".jpg", ".png", "psd", ".tga"
+    };
+
+    bool IsTextureExtension(const std::string& ext)
+    {
+        return std::find(std::begin(textureExtensions), std::end(textureExtensions), ext)
+                != std::end(textureExtensions);
+    }
+
+    static constexpr std::string_view audioExtensions[] = {
+        ".wav", ".mp3", ".ogg", ".aif"
+    };
+
+    bool IsAudioExtension(const std::string& ext)
+    {
+        return std::find(std::begin(audioExtensions), std::end(audioExtensions), ext)
+                != std::end(audioExtensions);
+    }
+}
 
 namespace core
 {
-    static AssetType ParseType(std::string_view token)
+    [[nodiscard]] std::variant<std::monostate, TextureAsset, AudioAsset> core::AssetParser::ParseAsset(const std::filesystem::path &assetPath) const
     {
-        if (token == "Texture") return AssetType::Texture;
-        if (token == "Audio") return AssetType::Audio;
-        return AssetType::Unknown;
-    }
+        std::string fileName = assetPath.filename().string();
+        std::string fileExtension = assetPath.extension().string();
+        int  fileSizeKB = static_cast<int>(std::filesystem::file_size(assetPath));
+        File file { .name=fileName, .extension=fileExtension, .sizeKB=fileSizeKB };
 
-    ParseResult AssetParser::ParseLine(const std::string& line) const
-    {
-        std::istringstream stream(line);
-
-        std::string typeToken;
-        std::string name;
-        int sizeKB = 0;
-
-        if (!(stream >> typeToken >> name >> sizeKB))
+        if (IsTextureExtension(fileExtension))
         {
-            return { std::nullopt, "Invalid asset format: " + line };
+            // TODO: Fully initialize TextureAsset
+            return TextureAsset { .file=file };
         }
 
-        AssetType type = ParseType(typeToken);
-        if (type == AssetType::Unknown)
+        if (IsAudioExtension(fileExtension))
         {
-            return { std::nullopt, "Unknown asset type: " + typeToken };
+            // TODO: Fully initialize AudioAsset
+            return AudioAsset { .file=file };
         }
 
-        Asset asset{ name, type, sizeKB };
-        return { asset, "" };
+        return std::monostate{};
     }
 }
+
+
