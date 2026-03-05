@@ -40,7 +40,7 @@ namespace core
     {
         std::string fileName = assetPath.filename().string();
         std::string fileExtension = assetPath.extension().string();
-        int  fileSizeKB = static_cast<int>(std::filesystem::file_size(assetPath));
+        int fileSizeKB = static_cast<int>(std::filesystem::file_size(assetPath) / 1024);
         File file { .name=fileName, .extension=fileExtension, .sizeKB=fileSizeKB };
 
         if (IsTextureExtension(fileExtension))
