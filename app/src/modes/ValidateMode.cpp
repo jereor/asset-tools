@@ -1,8 +1,7 @@
 #include "ValidateMode.h"
 
 #include "ToolModeFactory.h"
-#include "core/TextureAsset.h"
-#include "core/AudioAsset.h"
+#include "core/Asset.h"
 #include "core/AssetParser.h"
 #include "core/TextureAssetValidator.h"
 #include "core/TextureSizeRule.h"
