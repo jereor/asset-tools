@@ -2,10 +2,19 @@ pipeline {
     agent any
 
     stages {
-        stage('Build') {
+        stage('Build Image') {
+            steps {
+                script {
+                    dockerImage = docker.build('asset-tools-image')
+                }
+            }
+        }
+
+        stage('Build App') {
             agent {
                 docker {
-                    image 'ams21/cmake:4.2.1'
+                    image 'asset-tools-image'
+                    reuseNode true
                 }
             }
             steps {
