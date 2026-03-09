@@ -5,7 +5,7 @@ pipeline {
         stage('Build') {
             agent {
                 docker {
-                    image 'luxel/alpine-cmake:latest'
+                    image 'ams21/cmake:4.2.1'
                     reuseNode true
                 }
             }
