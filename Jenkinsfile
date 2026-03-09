@@ -19,7 +19,7 @@ pipeline {
 
                     cd scripts
                     ls -la
-                    ./build.bat
+                    ./build.sh
 
                     cd ..
                     ls -la
