@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 # Interactive build - runs build and waits for user input (useful when running outside a terminal)
 set -euo pipefail
 

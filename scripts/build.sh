@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 # Build script for daily work (fastest, only rebuilds changed files)
 set -euo pipefail
 

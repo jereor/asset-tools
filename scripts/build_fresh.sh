@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 # Build script for when you have CMake issues (complete reset, remove the build folder)
 set -euo pipefail
 

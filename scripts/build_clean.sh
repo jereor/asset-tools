@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 # Build script for when something feels off (clean binaries and rebuild all)
 set -euo pipefail
 
