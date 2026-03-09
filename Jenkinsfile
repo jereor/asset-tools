@@ -6,23 +6,18 @@ pipeline {
             agent {
                 docker {
                     image 'ams21/cmake:4.2.1'
-                    reuseNode true
                 }
             }
             steps {
                 sh '''
-                    pwd
-                    ls -la
-                    
+                    git --version
                     gcc --version
                     cmake --version
 
-                    cd scripts
+                    pwd
                     ls -la
-                    ./build.sh
 
-                    cd ..
-                    ls -la
+                    ./scripts/build.sh
 
                     cd build
                     ls -la
@@ -30,10 +25,7 @@ pipeline {
                     cd app
                     ls -la
 
-                    cd Release
-                    ls -la
-
-                    ./AssetTools.exe --help
+                    ./AssetTools --help
                 '''
             }
         }
