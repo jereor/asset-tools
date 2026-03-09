@@ -2,14 +2,39 @@ pipeline {
     agent any
 
     stages {
-        stage('Docker Test') {
+        stage('Build') {
             agent {
                 docker {
-                    image 'kitware/cmake:ci-debian13-x86_64-2026-02-08'
+                    image 'luxel/alpine-cmake:latest'
+                    reuseNode true
                 }
             }
             steps {
-                sh 'echo "Test With Docker"'
+                sh '''
+                    pwd
+                    ls -la
+                    
+                    gcc --version
+                    cmake --version
+
+                    cd scripts
+                    ls -la
+                    ./build.bat
+
+                    cd ..
+                    ls -la
+
+                    cd build
+                    ls -la
+
+                    cd app
+                    ls -la
+
+                    cd Release
+                    ls -la
+
+                    ./AssetTools.exe --help
+                '''
             }
         }
     }
