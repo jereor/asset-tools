@@ -28,13 +28,20 @@ pipeline {
 
                     ./scripts/build.sh
 
-                    cd build
-                    ls -la
-
-                    cd app
-                    ls -la
-
-                    ./AssetTools --help
+                    ./build/app/AssetTools --version
+                '''
+            }
+        }
+        stage("Validate Assets") {
+            agent {
+                docker {
+                    image 'asset-tools-image'
+                    reuseNode true
+                }
+            }
+            steps {
+                sh '''
+                    ./build/app/AssetTools validate . --texture-config textures.yaml --audio-config audio.yaml
                 '''
             }
         }
