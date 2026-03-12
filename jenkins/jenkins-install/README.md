@@ -32,7 +32,11 @@ Open Jenkins by going to: [http://localhost:8080/](http://localhost:8080/) and f
 
 ## Step 5
 
-If you wish to stop Jenkins and get back to it later, run:
+Navigate to the Plugins menu and install the Docker Pipeline plugin to enable Docker Agents in Jenkins pipelines.
+
+## Step 6
+
+If you wish to stop Jenkins, run:
 
 ```
 docker compose down
