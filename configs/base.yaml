@@ -7,7 +7,7 @@ validation:
   failOnWarning: false
 
 paths:
-  assetsRoot: "assets/"
+  assetsRoot: "tests/assets/"
 
 logging:
   verbose: false
