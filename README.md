@@ -38,6 +38,9 @@ This project is learning-focused, but intentionally designed to be
 ### Validate Assets
 
 AssetTools validate <asset_file>
+
+OR
+
 AssetTools validate <asset_directory>
 
 Behavior:
