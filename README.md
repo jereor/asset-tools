@@ -120,7 +120,7 @@ Config layers (in order of precedence)
 4. [Planned] Asset-level metadata (.meta files) - Override rules for specific assets
 
 Each layer:
-- Is optional except base.yaml
+- Is optional (except base.yaml)
 - Overrides values from previous layers
 
 ---
@@ -141,7 +141,7 @@ This mirrors how studios structure shared tooling and engine-side code.
 This directory is reserved for installing and configuring **Jenkins**.
 It contains:
 - Jenkinsfile: Defines the Jenkins pipeline as code. Used by the **Jenkins server**.
-- Dockerfile: Defines the CMake environment needed to build asset-tools. Used by **Jenkins Docker agents**.
+- Dockerfile: Defines the image needed to build asset-tools. Used by **Jenkins Docker agents** and **developers**.
 
 The /jenkins-install directory contains instructions how to install Jenkins on your machine using Docker.
 ---
@@ -149,8 +149,7 @@ The /jenkins-install directory contains instructions how to install Jenkins on y
 ### `scripts`
 
 Contains **shell scripts** for building the project using **CMake**.
-They are designed to make development more straightforward and
-to be used on all platforms.
+They are designed to make development more straightforward.
 
 ---
 
@@ -177,6 +176,7 @@ Only CMake, a C++ compiler, and Git are required. CMake installs the rest automa
 
 - **CMake** (target-based)
 - Automatic package management with **vcpkg**
+- **Docker** containerization
 - Out-of-source builds
 - Static library + executable architecture
 - Designed to scale to multiple tools and shared codebases
@@ -186,14 +186,14 @@ setting up their environment. Docker takes care that you have all the dependenci
 the project, and vcpkg takes care that the project has all the required libraries required for linking.
 
 ### Build instructions
-Note: If on bash, use $(pwd)  instead of ${PWD}
+Note: If on bash, use (pwd) instead of {PWD}
 
-docker build -t asset-tools-env .\jenkins\
-docker run --rm -it -v ${PWD}:/workspace asset-tools-env
-./scripts/build.sh
+1. docker build -t asset-tools-env .\jenkins\
+2. docker run --rm -it -v ${PWD}:/workspace asset-tools-env
+3. ./scripts/build.sh
 
 If any issues:
-./scripts/build_clean.sh
+- ./scripts/build_clean.sh
 
 ---
 
