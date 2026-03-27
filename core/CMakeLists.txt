@@ -17,7 +17,3 @@ if(MSVC)
 else()
     target_compile_options(core PRIVATE -Wall -Wextra -Wpedantic)
 endif()
-
-target_link_libraries(core 
-    PUBLIC yaml-cpp
-)

@@ -19,7 +19,9 @@ else()
     target_compile_options(AssetTools PRIVATE -Wall -Wextra -Wpedantic)
 endif()
 
-target_link_libraries(AssetTools
-    PRIVATE core
-    PRIVATE yaml-cpp::yaml-cpp
+find_package(yaml-cpp CONFIG REQUIRED)
+
+target_link_libraries(AssetTools PRIVATE
+    core
+    yaml-cpp::yaml-cpp
 )

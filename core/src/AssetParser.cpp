@@ -1,5 +1,8 @@
 #include "core/AssetParser.h"
 
+#include <algorithm>
+#include <cctype>
+
 namespace
 {
     std::string GetFileExtension(const std::filesystem::path& filePath)
@@ -17,7 +20,7 @@ namespace
         ".jpg", ".png", "psd", ".tga"
     };
 
-    bool IsTextureExtension(const std::string& ext)
+    bool IsTextureExtension(const std::string_view& ext)
     {
         return std::find(std::begin(textureExtensions), std::end(textureExtensions), ext)
                 != std::end(textureExtensions);
@@ -39,7 +42,7 @@ namespace core
     [[nodiscard]] std::variant<std::monostate, TextureAsset, AudioAsset> core::AssetParser::ParseAsset(const std::filesystem::path &assetPath) const
     {
         std::string fileName = assetPath.filename().string();
-        std::string fileExtension = assetPath.extension().string();
+        std::string fileExtension = GetFileExtension(assetPath);
         int fileSizeKB = static_cast<int>(std::filesystem::file_size(assetPath) / 1024);
         File file { .name=fileName, .extension=fileExtension, .sizeKB=fileSizeKB };
 

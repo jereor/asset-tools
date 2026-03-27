@@ -144,24 +144,22 @@ It contains rules for the build process, allowing CMake to generate the necessar
 
 ## 🔧 Build System
 
-- **CMake (target-based)**
-- **Out-of-source builds**
-- **Static library + executable architecture**
+- **CMake** (target-based)
+- Automatic package management with **vcpkg**
+- Out-of-source builds
+- Static library + executable architecture
 - Designed to scale to multiple tools and shared codebases
 
-### Pre-Requirements:
-- CMake (3.16 or newer)
-- C++23 compiler (LLVM 18.0+ or MSVC 18.0+)
+AssetTools is designed to be built inside a Docker container, so developers don't need to worry about 
+setting up their environment. Docker takes care that you have all the dependencies required to build
+the project, and vcpkg takes care that the project has all the required libraries required for linking.
 
-### Build Instructions (Windows)
+### Build instructions
+Note: If on bash, use $(pwd)  instead of ${PWD}
 
-- CLI: use `build.bat`
-- File Explorer: use `build_interactive.bat`
-
-### Build Instructions (MacOS)
-Navigate to the 'asset-tools' folder and run the following commands (use your compiler path):
-- cmake -S . -B build -DCMAKE_CXX_COMPILER=/usr/local/opt/llvm-18/bin/clang++
-- cmake --build build --config Release --parallel
+docker build -t asset-tools-env .\jenkins\
+docker run --rm -it -v ${PWD}:/workspace asset-tools-env
+./scripts/build.sh
 
 ---
 
