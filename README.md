@@ -2,8 +2,11 @@
 
 AssetTools is a C++ prototype of an **internal game development tool**
 designed to support **content creation workflows and asset pipelines**.
+AssetTools can scale to hold multiple different asset tools, like asset validation, 
+asset inspection, asset scanning, etc.
+However, this prototype focuses mainly on asset validation.
 
-The project focuses on pre-engine asset validation similar to what game companies 
+This prototype showcases pre-engine asset validation similar to what game companies 
 like Supercell would use. 
 The idea is that assets are validated close to asset creation to catch problems 
 before the assets are imported to the game engine. 
@@ -32,12 +35,16 @@ This project is learning-focused, but intentionally designed to be
 
 ## 🛠 Tool Usage
 
-### Validate Asset Data
+### Validate Assets
 
 AssetTools validate <asset_file>
 
+OR
+
+AssetTools validate <asset_directory>
+
 Behavior:
-- Parses asset definitions from the input file
+- Parses asset/assets into data structs
 - Applies rule-based validation
 - Logs rule violations
 
@@ -46,7 +53,7 @@ Behavior:
 AssetTools inspect <asset_file>
 
 Behavior:
-- Retrieves asset metadata from the input file
+- Retrieves asset metadata from the asset file
 - Logs asset metadata, including file extension, file size, and last-modified timestamp
 
 ---
@@ -56,10 +63,11 @@ Behavior:
 This project is under active development as a learning-focused tools
 prototype. Future work includes:
 
-- Configurable validation rules
-- Directory-based asset discovery
-- Platform-specific constraints
-- Improved CLI ergonomics and diagnostics
+- Graphical UI
+- Automated tests
+- Validation Summary (success/failure counts)
+- '--verbose' flag wired to logging
+- More texture validation rules (image dimensions, power-of-two, color model, etc.)
 
 ---
 
@@ -67,34 +75,29 @@ prototype. Future work includes:
 
 AssetTools/ 
 
-├── app/         # Tool executable and mode-based command-line logic
+├── app/           # Tool executable and mode-based command-line logic
 
-├── assets/      # Sample asset data used for validation and testing
+├── build/         # Out-of-source build artifacts (generated)
 
-├── build/       # Out-of-source build artifacts (generated)
+├── configs/       # YAML configuration files to configure tool behavior and validation rules
 
-├── configs/     # YAML configuration files to configure tool behavior and validation rules
+├── core/          # Shared engine-style core library (logging, assets, validation)
 
-├── core/        # Shared engine-style core library (logging, assets, validation)
+├── jenkins/       # Jenkins and Docker configuration files for running Jenkins
 
-└── CMakeLists.txt  # Top-level CMake project configuration
+├── scripts/       # Scripts for building the app with CMake
+
+├── tests/assets/  # Sample asset data used for validation and testing
+
+└── CMakeLists.txt # Top-level CMake project configuration
 
 ### `app`
 
 The **tool executable**, implemented as a command-line utility.
 Can be extended with a GUI later on.
 
-It supports **multiple modes** and acts as a pipeline-facing tool that
+It supports **multiple modes** and acts as a tool that
 can be invoked by developers, scripts, or CI systems.
-
----
-
-### `assets`
-
-Contains **sample assets** used to
-demonstrate and test the validation pipeline.
-
-These files are included for demonstration and testing only.
 
 ---
 
@@ -133,12 +136,40 @@ tools library.
 
 This mirrors how studios structure shared tooling and engine-side code.
 
+### `jenkins`
+
+This directory is reserved for installing and configuring **Jenkins**.
+It contains:
+- Jenkinsfile: Defines the Jenkins pipeline as code. Used by the **Jenkins server**.
+- Dockerfile: Defines the CMake environment needed to build asset-tools. Used by **Jenkins Docker agents**.
+
+The /jenkins-install directory contains instructions how to install Jenkins on your machine using Docker.
+---
+
+### `scripts`
+
+Contains **shell scripts** for building the project using **CMake**.
+They are designed to make development more straightforward and
+to be used on all platforms.
+
+---
+
+### `tests/assets`
+
+Contains **sample assets** used to
+demonstrate and test the validation pipeline.
+
+These files are included for demonstration and testing only.
+
 ---
 
 ### `CMakeLists.txt`
 
 Used by CMake to define the project's source files, build targets, and configuration options. 
 It contains rules for the build process, allowing CMake to generate the necessary files for building the executable.
+
+Designed to work on all platforms, without requiring all the dependencies to be installed before-hand.
+Only CMake, a C++ compiler, and Git are required. CMake installs the rest automatically through Git.
 
 ---
 
@@ -161,6 +192,9 @@ docker build -t asset-tools-env .\jenkins\
 docker run --rm -it -v ${PWD}:/workspace asset-tools-env
 ./scripts/build.sh
 
+If any issues:
+./scripts/build_clean.sh
+
 ---
 
 ## 🧠 Design Philosophy
@@ -180,13 +214,13 @@ YAML files
 
 ConfigLoader
 
-   ↓  (schema validation only)
+   ↓
 
 Typed C++ config structs
 
    ↓
 
-Tool modes (inspect / validate)
+Tool modes (validate / inspect)
 
    ↓
 
