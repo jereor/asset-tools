@@ -5,7 +5,7 @@ pipeline {
         stage('Build Image') {
             steps {
                 script {
-                    dockerImage = docker.build('asset-tools-env', './jenkins')
+                    dockerImage = docker.build('asset-tools-env', './app')
                 }
             }
         }
