@@ -195,8 +195,8 @@ the project, and vcpkg takes care that the project has all the required librarie
 Note: If on bash, use (pwd) instead of {PWD}
 
 1. docker build -t asset-tools-env .\app\
-2. docker run --rm -it -v ${PWD}:/workspace asset-tools-env
-3. ./scripts/build.sh
+2. docker run --rm -it -v ${PWD}:/workspace/asset-tools asset-tools-env
+3. ./asset-tools/scripts/build.sh
 
 If any issues:
 - ./scripts/build_clean.sh

@@ -11,16 +11,14 @@ RUN apt-get update && apt-get install -y \
     pkg-config \
     && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /opt
-RUN git clone https://github.com/microsoft/vcpkg.git
-
-WORKDIR /opt/vcpkg
-RUN ./bootstrap-vcpkg.sh
+WORKDIR /workspace
+RUN git clone https://github.com/microsoft/vcpkg.git \
+ && ./vcpkg/bootstrap-vcpkg.sh
 
 ENV VCPKG_DISABLE_METRICS=1
-ENV VCPKG_ROOT=/opt/vcpkg
-ENV CMAKE_TOOLCHAIN_FILE=/opt/vcpkg/scripts/buildsystems/vcpkg.cmake
-
-WORKDIR /workspace
+ENV VCPKG_FEATURE_FLAGS=manifests,binarycaching
+ENV VCPKG_DEFAULT_BINARY_CACHE=/vcpkg-cache
+ENV VCPKG_ROOT=/workspace/vcpkg
+ENV CMAKE_TOOLCHAIN_FILE=/workspace/vcpkg/scripts/buildsystems/vcpkg.cmake
 
 CMD ["bash"]
