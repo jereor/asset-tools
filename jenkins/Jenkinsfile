@@ -5,7 +5,7 @@ pipeline {
         stage('Build Image') {
             steps {
                 script {
-                    dockerImage = docker.build('cmake-environment', './jenkins')
+                    dockerImage = docker.build('asset-tools-env', './jenkins')
                 }
             }
         }
@@ -13,7 +13,7 @@ pipeline {
         stage('Build App') {
             agent {
                 docker {
-                    image 'cmake-environment'
+                    image 'asset-tools-env'
                     reuseNode true
                 }
             }
@@ -35,7 +35,7 @@ pipeline {
         stage("Validate Assets") {
             agent {
                 docker {
-                    image 'cmake-environment'
+                    image 'asset-tools-env'
                     reuseNode true
                 }
             }

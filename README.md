@@ -79,11 +79,13 @@ AssetTools/
 
 ├── build/         # Out-of-source build artifacts (generated)
 
-├── configs/       # YAML configuration files to configure tool behavior and validation rules
+├── ci/               # Jenkins server setup with Docker Compose
+
+├── configs/      # YAML configuration files to configure tool behavior and validation rules
 
 ├── core/          # Shared engine-style core library (logging, assets, validation)
 
-├── jenkins/       # Jenkins and Docker configuration files for running Jenkins
+├── jenkins/      # Reserved for the Jenkinsfile that Jenkins uses
 
 ├── scripts/       # Scripts for building the app with CMake
 
@@ -98,6 +100,8 @@ Can be extended with a GUI later on.
 
 It supports **multiple modes** and acts as a tool that
 can be invoked by developers, scripts, or CI systems.
+
+Contains a Dockerfile for the app that developers and CI can use to set up a build environment.
 
 ---
 
@@ -125,6 +129,12 @@ Each layer:
 
 ---
 
+### `ci`
+
+Contains everything a developer needs to set up a local CI pipeline using Docker Compose.
+
+---
+
 ### `core`
 
 Represents **shared technology** similar to an internal engine or common
@@ -138,12 +148,8 @@ This mirrors how studios structure shared tooling and engine-side code.
 
 ### `jenkins`
 
-This directory is reserved for installing and configuring **Jenkins**.
-It contains:
-- Jenkinsfile: Defines the Jenkins pipeline as code. Used by the **Jenkins server**.
-- Dockerfile: Defines the image needed to build asset-tools. Used by **Jenkins Docker agents** and **developers**.
+This directory is reserved for the Jenkinsfile that Jenkins uses.
 
-The /jenkins-install directory contains instructions how to install Jenkins on your machine using Docker.
 ---
 
 ### `scripts`
@@ -188,7 +194,7 @@ the project, and vcpkg takes care that the project has all the required librarie
 ### Build instructions
 Note: If on bash, use (pwd) instead of {PWD}
 
-1. docker build -t asset-tools-env .\jenkins\
+1. docker build -t asset-tools-env .\app\
 2. docker run --rm -it -v ${PWD}:/workspace asset-tools-env
 3. ./scripts/build.sh
 

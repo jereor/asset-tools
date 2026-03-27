@@ -1,6 +1,6 @@
 # Install Jenkins using Docker Compose
 
-This directory contains a Docker Compose configuration for a quick installation of Jenkins. This setup is not intended for production systems. This setup is designed only for local development of this project.
+This directory contains a Docker Compose configuration for a quick setup of Jenkins. This setup is not intended for production systems. This setup is designed only for local development of this project.
 
 Credits: This approach is taken from https://github.com/vdespa/install-jenkins-docker, which in turn is mostly based on the [official instructions](https://www.jenkins.io/doc/book/installing/docker/) but takes advantage of Docker Compose (by using a `docker-compose.yml` file) to reduce the number of steps needed to get Jenkins up and running.
 
@@ -15,7 +15,7 @@ Install Docker locally (Docker Desktop is easiest).
 Open a terminal window in this directory. Then build the Jenkins Docker image:
 
 ```
-docker build -t my-jenkins .
+docker build -t my-jenkins .\jenkins\
 ```
 
 ## Step 3
