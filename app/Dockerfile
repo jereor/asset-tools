@@ -13,7 +13,8 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /workspace
 RUN git clone https://github.com/microsoft/vcpkg.git \
- && ./vcpkg/bootstrap-vcpkg.sh
+ && ./vcpkg/bootstrap-vcpkg.sh \
+ && chown -R 1000:1000 /workspace/vcpkg
 
 ENV VCPKG_DISABLE_METRICS=1
 ENV VCPKG_FEATURE_FLAGS=manifests,binarycaching
