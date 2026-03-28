@@ -5,9 +5,12 @@ pipeline {
         stage('Build Image') {
             steps {
                 script {
+                    def uid = sh(script: 'id -u', returnStdout: true).trim()
+                    def gid = sh(script: 'id -g', returnStdout: true).trim()
+
                     dockerImage = docker.build(
                         'asset-tools-env',
-                        "--build-arg UID=$(id -u) --build-arg GID=$(id -g) ./app"
+                        "--build-arg UID=${uid} --build-arg GID=${gid} ./app"
                     )
                 }
             }
