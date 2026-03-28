@@ -5,7 +5,10 @@ pipeline {
         stage('Build Image') {
             steps {
                 script {
-                    dockerImage = docker.build('asset-tools-env', './app --no-cache')
+                    dockerImage = docker.build(
+                        'asset-tools-env',
+                        "--build-arg UID=$(id -u) --build-arg GID=$(id -g) ./app"
+                    )
                 }
             }
         }
@@ -24,8 +27,12 @@ pipeline {
                     gcc --version
                     cmake --version
 
+                    id
                     pwd
-                    ls -la
+                    ls -lad
+                    ls -lad /workspace
+                    ls -lad /workspace/vcpkg
+                    ls -lad /var/jenkins_home/workspace
 
                     ./scripts/build.sh
 
