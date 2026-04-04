@@ -1,0 +1,10 @@
+services:
+  asset-tools:
+    build:
+      context: ./app
+    image: asset-tools-env
+    volumes:
+      - .:/workspace/asset-tools
+    working_dir: /workspace/asset-tools
+    stdin_open: true
+    tty: true

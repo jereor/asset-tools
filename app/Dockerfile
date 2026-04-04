@@ -23,7 +23,7 @@ WORKDIR /workspace
 RUN git clone https://github.com/microsoft/vcpkg.git \
  && ./vcpkg/bootstrap-vcpkg.sh
 
-RUN chown -R jenkins:jenkins /workspace
+RUN chown -R $UID:$GID /workspace
 
 ENV VCPKG_ROOT=/workspace/vcpkg
 ENV CMAKE_TOOLCHAIN_FILE=/workspace/vcpkg/scripts/buildsystems/vcpkg.cmake
