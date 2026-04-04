@@ -37,11 +37,11 @@ This project is learning-focused, but intentionally designed to be
 
 ### Validate Assets
 
-AssetTools validate <asset_file>
+`AssetTools validate <asset_file>`
 
 OR
 
-AssetTools validate <asset_directory>
+`AssetTools validate <asset_directory>`
 
 Behavior:
 - Parses asset/assets into data structs
@@ -50,7 +50,7 @@ Behavior:
 
 ### Inspect Assets
 
-AssetTools inspect <asset_file>
+`AssetTools inspect <asset_file>`
 
 Behavior:
 - Retrieves asset metadata from the asset file
@@ -192,14 +192,10 @@ setting up their environment. Docker takes care that you have all the dependenci
 the project, and vcpkg takes care that the project has all the required libraries required for linking.
 
 ### Build instructions
-Note: If on bash, use (pwd) instead of {PWD}
+`docker compose run --rm asset-tools`
 
-1. docker build -t asset-tools-env .\app\
-2. docker run --rm -it -v ${PWD}:/workspace/asset-tools asset-tools-env
-3. ./asset-tools/scripts/build.sh
-
-If any issues:
-- ./scripts/build_clean.sh
+If any issues: 
+`./scripts/build_clean.sh`
 
 ---
 
