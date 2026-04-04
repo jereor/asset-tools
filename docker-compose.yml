@@ -5,6 +5,10 @@ services:
     image: asset-tools-env
     volumes:
       - .:/workspace/asset-tools
+      - vcpkg-cache:/vcpkg-cache
     working_dir: /workspace/asset-tools
     stdin_open: true
     tty: true
+
+volumes:
+  vcpkg-cache:
